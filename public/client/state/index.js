@@ -2,14 +2,12 @@ import _ from 'lodash'
 import { combineReducers } from 'redux'
 
 import { mergeActions } from './utils'
-import * as slides from './slides'
-import * as modules from './modules'
+import * as game from './game'
 
 const defaultFunction = ({default: def}) => def
 
 const stateHandlers = {
-  slides,
-  modules
+  game
 }
 
 const reducerFuncs = _.mapValues(stateHandlers, defaultFunction)
