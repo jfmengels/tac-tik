@@ -43,6 +43,8 @@ describe('game - starting a piece', () => {
   it('should set an error if a blocking piece is already present', () => {
     const tmpState = reducer(startState, putPieceOnBoard(2))
     const state = reducer(tmpState, putPieceOnBoard(2))
-    expect(state.error).to.equal(`Can't put a new piece on the board because an other piece is blocking`)
+    expect(state.error).to.equal(`Can't remove a blocking piece from the board`)
+    expect(state.pieces.length).to.equal(1)
+    expect(state.players[2].piecesInStock).to.equal(3)
   })
 })

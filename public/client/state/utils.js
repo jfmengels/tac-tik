@@ -53,3 +53,13 @@ export const mergeActions = (stateHandlers) => {
   }
   return mergedActions
 }
+
+
+export const updeepReducer = (functions) => {
+  const fns = typeof functions === 'function' ? [functions] : functions
+
+  return (state, action) => fns.reduce(
+    (tmpState, fn) => u(fn(action), tmpState),
+    state
+  )
+}
