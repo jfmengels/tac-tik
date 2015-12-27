@@ -1,0 +1,13 @@
+.box {
+  padding: 0 2;
+}
+
+.full {
+  composes: box;
+  color: green;
+}
+
+.empty {
+  composes: box;
+  color: red;
+}
