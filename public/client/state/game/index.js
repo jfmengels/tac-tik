@@ -1,10 +1,12 @@
 import _ from 'lodash'
 import u from 'updeep'
 
+import { createNewDeck } from './cards'
 import { createReducer } from '../utils'
 
 const prefix = 'game/'
 const PUT_PIECE_ON_BOARD = prefix + 'PUT_PIECE_ON_BOARD'
+const DISTRIBUTE_CARDS = prefix + 'DISTRIBUTE_CARDS'
 const MOVE_PIECE = prefix + 'MOVE_PIECE'
 
 const numberOfPlayers = 4
@@ -113,6 +115,21 @@ const movePieceReducer = (state, {pos, steps}) => {
   )(state)
 }
 
+const distributeCardsReducer = (state, {cards}) => {
+  const cardsForEachPlayer = _.chunk(_.take(cards, 16), 4)
+
+  const updater = {
+    players: (players) => {
+      return players.map((player, index) => {
+        return Object.assign({}, player, {cards: cardsForEachPlayer[index]})
+      })
+    },
+    cardsInDeck: _.takeRight(cards, cards.length - 16)
+  }
+
+  return u(updater, state)
+}
+
 const partnerId = (id) =>
   (id + (numberOfPlayers / 2)) % numberOfPlayers
 
@@ -140,7 +157,8 @@ const initialState = {
 
 export default createReducer(initialState, {
   [PUT_PIECE_ON_BOARD]: putPieceOnBoardReducer,
-  [MOVE_PIECE]: movePieceReducer
+  [MOVE_PIECE]: movePieceReducer,
+  [DISTRIBUTE_CARDS]: distributeCardsReducer
 })
 
 export const putPieceOnBoard = (id) => ({
@@ -152,4 +170,9 @@ export const movePiece = (pos, steps) => ({
   type: MOVE_PIECE,
   pos,
   steps
+})
+
+export const distributeCards = (cardsLeft) => ({
+  type: DISTRIBUTE_CARDS,
+  cards: cardsLeft.length !== 0 ? cardsLeft : createNewDeck()
 })
