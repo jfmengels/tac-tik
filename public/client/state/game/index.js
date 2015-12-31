@@ -2,12 +2,14 @@ import _ from 'lodash'
 import u from 'updeep'
 
 import { createNewDeck } from './cards'
+// import { } from './cardAction'
 import { createReducer } from '../utils'
 
 const prefix = 'game/'
-const PUT_PIECE_ON_BOARD = prefix + 'PUT_PIECE_ON_BOARD'
-const DISTRIBUTE_CARDS = prefix + 'DISTRIBUTE_CARDS'
-const MOVE_PIECE = prefix + 'MOVE_PIECE'
+const PUT_PIECE_ON_BOARD = Symbol(prefix + 'PUT_PIECE_ON_BOARD')
+const DISTRIBUTE_CARDS = Symbol(prefix + 'DISTRIBUTE_CARDS')
+const MOVE_PIECE = Symbol(prefix + 'MOVE_PIECE')
+const PLAY_CARD = Symbol(prefix + 'PLAY_CARD')
 
 const numberOfPlayers = 4
 const distanceBetweenPlayers = 16
@@ -130,10 +132,26 @@ const distributeCardsReducer = (state, {cards}) => {
   return u(updater, state)
 }
 
+const playCardReducer = (state, {playerId, card}) => {
+  const updater = {
+    players: (players) => {
+      return players.map((player) => {
+        if (player.id !== playerId) {
+          return player
+        }
+        const filteredCards = player.cards.filter((c) => !_.isEqual(c, card))
+        return Object.assign({}, player, {cards: filteredCards})
+      })
+    }
+  }
+
+  return u(updater, state)
+}
+
 const partnerId = (id) =>
   (id + (numberOfPlayers / 2)) % numberOfPlayers
 
-const player = (id) => ({
+const newPlayer = (id) => ({
   id,
   piecesInStock: 4,
   partnerId: partnerId(id),
@@ -149,7 +167,7 @@ const player = (id) => ({
 //   isBlocking: <boolean>
 // }
 const initialState = {
-  players: [0, 1, 2, 3].map(player),
+  players: [0, 1, 2, 3].map(newPlayer),
   pieces: [],
   cardsInDeck: [],
   error: null
@@ -158,7 +176,8 @@ const initialState = {
 export default createReducer(initialState, {
   [PUT_PIECE_ON_BOARD]: putPieceOnBoardReducer,
   [MOVE_PIECE]: movePieceReducer,
-  [DISTRIBUTE_CARDS]: distributeCardsReducer
+  [DISTRIBUTE_CARDS]: distributeCardsReducer,
+  [PLAY_CARD]: playCardReducer
 })
 
 export const putPieceOnBoard = (id) => ({
@@ -175,4 +194,10 @@ export const movePiece = (pos, steps) => ({
 export const distributeCards = (cardsLeft) => ({
   type: DISTRIBUTE_CARDS,
   cards: cardsLeft.length !== 0 ? cardsLeft : createNewDeck()
+})
+
+export const playCard = (playerId, card) => ({
+  type: PLAY_CARD,
+  playerId,
+  card
 })
