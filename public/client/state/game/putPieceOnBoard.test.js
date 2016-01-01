@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import { expect } from 'chai'
 
-import reducer, { putPieceOnBoard } from './'
+import reducer from './'
+import putPieceOnBoard from './putPieceOnBoard'
 
 describe('game - starting a piece', () => {
   let startState
@@ -11,7 +12,7 @@ describe('game - starting a piece', () => {
   })
 
   it('should put a new piece on the board and remove one from the stock', () => {
-    const state = reducer(startState, putPieceOnBoard(2))
+    const state = putPieceOnBoard(2, startState)
     expect(state.players[2].piecesInStock).to.equal(3)
     expect(state.pieces.length).to.equal(1)
 
@@ -23,11 +24,11 @@ describe('game - starting a piece', () => {
   })
 
   it('should remove a piece if one is present at the starting position', () => {
-    const tmpState = _.cloneDeep(reducer(startState, putPieceOnBoard(2)))
+    const tmpState = _.cloneDeep(putPieceOnBoard(2, startState))
     tmpState.pieces[0].pos = 0
     tmpState.pieces[0].isBlocking = false
 
-    const state = reducer(tmpState, putPieceOnBoard(0))
+    const state = putPieceOnBoard(0, tmpState)
 
     expect(state.players[2].piecesInStock).to.equal(4)
     expect(state.players[0].piecesInStock).to.equal(3)
@@ -41,8 +42,8 @@ describe('game - starting a piece', () => {
   })
 
   it('should set an error if a blocking piece is already present', () => {
-    const tmpState = reducer(startState, putPieceOnBoard(2))
-    const state = reducer(tmpState, putPieceOnBoard(2))
+    const tmpState = putPieceOnBoard(2, startState)
+    const state = putPieceOnBoard(2, tmpState)
     expect(state.error).to.equal(`Can't remove a blocking piece from the board`)
     expect(state.pieces.length).to.equal(1)
     expect(state.players[2].piecesInStock).to.equal(3)
