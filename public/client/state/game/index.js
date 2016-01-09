@@ -3,12 +3,22 @@ import u from 'updeep'
 
 import createNewDeck from './cards'
 import distributeCards from './distributeCards'
+import putPieceOnBoard from './putPieceOnBoard'
+import movePiece from './movePiece'
+import { conditionalUpdater } from './common'
 import { createReducer } from '../utils'
 
 const prefix = 'game/'
 const PLAY_CARD = prefix + 'PLAY_CARD'
 
-const playCardReducer = (state, {playerId, card}) => {
+const playCardReducer = (state, {playerId, card, cardOptions}) => {
+  const foundCard = _.find(state.players[playerId].cards, card)
+  if (!foundCard) {
+    return u({
+      error: `Could not play card absent from player's hand`
+    }, state)
+  }
+
   const updater = {
     players: (players) => {
       return players.map((player) => {
@@ -21,7 +31,17 @@ const playCardReducer = (state, {playerId, card}) => {
     }
   }
 
-  return u(updater, state)
+  let operation
+  if (card.action === 'START' && cardOptions.newPiece === true) {
+    operation = _.partial(putPieceOnBoard, playerId)
+  } else if (card.action === 'MOVE' || card.action === 'START') {
+    operation = _.partial(movePiece, cardOptions.piece, card.value)
+  }
+
+  return _.flow(
+    operation,
+    conditionalUpdater(updater)
+  )(state)
 }
 
 const partnerId = (id, numberOfPlayers) =>
@@ -58,8 +78,9 @@ export default createReducer(initialState, {
   [PLAY_CARD]: playCardReducer
 })
 
-export const playCard = (playerId, card) => ({
+export const playCard = (playerId, card, cardOptions) => ({
   type: PLAY_CARD,
   playerId,
-  card
+  card,
+  cardOptions
 })

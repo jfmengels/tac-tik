@@ -4,18 +4,18 @@ import u from 'updeep'
 import { atPos, removeAtPosition, conditionalUpdater } from './common'
 
 const inBetween = (startPos, endPos) =>
-({pos}) => {
-  if (endPos < startPos) { // Looping the board
-    return pos <= endPos || startPos < pos
+  ({pos}) => {
+    if (endPos < startPos) { // Looping the board
+      return pos <= endPos || startPos < pos
+    }
+    return startPos < pos && pos <= endPos
   }
-  return startPos < pos && pos <= endPos
-}
 
 const hasBlockingElements = (startPos, endPos, state) =>
-state.pieces
-  .filter(({isBlocking}) => isBlocking)
-  .filter(inBetween(startPos, endPos))
-  .length > 0
+  state.pieces
+    .filter(({isBlocking}) => isBlocking)
+    .filter(inBetween(startPos, endPos))
+    .length > 0
 
 
 export default (pos, steps, state) => {
