@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _ from 'lodash/fp'
 import u from 'updeep'
 
 import { atPos, removeAtPosition, conditionalUpdater } from './common'

@@ -18,8 +18,8 @@ describe('game - distributing cards', () => {
       expect(cards.length).to.equal(4)
       return cards
     })
-    expect(_.unique(_.flatten(allPlayerCards)).length).to.equal(16)
-    expect(_.unique(_.flatten(allPlayerCards.concat(startState.cardsInDeck))).length).to.equal(48)
+    expect(_.uniq(_.flatten(allPlayerCards)).length).to.equal(16)
+    expect(_.uniq(_.flatten(allPlayerCards.concat(startState.cardsInDeck))).length).to.equal(48)
   })
 
   it('should deal 4 cards to every player and remove them from the deck', () => {
@@ -30,8 +30,8 @@ describe('game - distributing cards', () => {
       expect(cards.length).to.equal(4)
       return cards
     })
-    expect(_.unique(_.flatten(allPlayerCards)).length).to.equal(16)
-    expect(_.unique(_.flatten(allPlayerCards.concat(state.cardsInDeck))).length).to.equal(32)
+    expect(_.uniq(_.flatten(allPlayerCards)).length).to.equal(16)
+    expect(_.uniq(_.flatten(allPlayerCards.concat(state.cardsInDeck))).length).to.equal(32)
   })
 
   it('should deplete cardsInDeck at every call', () => {

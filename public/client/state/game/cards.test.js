@@ -29,7 +29,7 @@ describe('game - cards shuffling', () => {
     expect(_.filter(cards, {value: 12, action: 'MOVE'}).length).to.equal(4)
 
     // All cards should be unique
-    expect(_.unique(cards).length).to.equal(48)
+    expect(_.uniq(cards).length).to.equal(48)
   })
 
   it('should have the deck be shuffled at every call', () => {
