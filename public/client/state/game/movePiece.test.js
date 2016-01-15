@@ -94,7 +94,7 @@ describe('game - moving a piece', () => {
   })
 
   it('should remove a piece if one is present at the starting position', () => {
-    const tmpState = _.cloneDeep(putPieceOnBoard(2, startState))
+    const tmpState = _.cloneDeep(startState)
     tmpState.pieces[0].pos = 0
     tmpState.pieces[0].isBlocking = false
 

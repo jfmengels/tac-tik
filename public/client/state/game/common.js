@@ -1,3 +1,4 @@
+import _ from 'lodash/fp'
 import u from 'updeep'
 
 /**
@@ -13,6 +14,20 @@ export const atPos = (wanted, position) =>
   ({pos, isAtDestination}) =>
     (pos === position) === wanted && !isAtDestination
 
+const isAtPos = (position) =>
+  ({pos, isAtDestination}) =>
+    pos === position && !isAtDestination
+
+const applyToKeyAndAssign = (key, fn) => (state) => {
+  const updatedValue = fn(state[key])
+  return _.assign({[key]: updatedValue})(state)
+}
+
+const applyToIndexAndAssign = (index, fn) => (state) => {
+  const updatedValue = fn(state[index])
+  return state.map((v, i) => i === index ? updatedValue : v)
+}
+
 /**
  * Remove a piece from the board if one sits at the given position.
  * @param  {int} position position on the board
@@ -20,30 +35,31 @@ export const atPos = (wanted, position) =>
  * @return {state} Updated state.
  * - Untouched state if no piece was at the given position
  * - State with the piece removed from the board if one was at the given position
- * - State with Untouched board but with an error if a blocking piece was at the given position
+ * - State with untouched board but with an error if a blocking piece was at the given position
  */
 export const removeAtPosition = (position, state) => {
-  let updater = {
-    pieces: (p) => p.filter(atPos(false, position)),
-    error: null
+  const piecesAtGivenPosition = state.pieces.filter(atPos(true, position))
+  if (piecesAtGivenPosition.length === 0) {
+    return state
   }
 
-  const piecesAtGivenPosition = state.pieces.filter(atPos(true, position))
-  if (piecesAtGivenPosition.length === 1) {
-    const {player, isBlocking} = piecesAtGivenPosition[0]
-    if (isBlocking) {
-      updater = {
-        error: `Can't remove a blocking piece from the board`
-      }
-    } else {
-      updater.players = {
-        [player]: {
-          piecesInStock: (n) => n + 1
-        }
-      }
-    }
+  const {player, isBlocking} = piecesAtGivenPosition[0]
+  if (isBlocking) {
+    return _.assign({error: `Can't remove a blocking piece from the board`}, state)
   }
-  return u(updater, state)
+
+  return _.flow(
+    // Remove piece at given position
+    applyToKeyAndAssign('pieces',
+      _.filter(_.negate(isAtPos(position)))
+    ),
+    // === state.players[playerToGiveAPieceTo].piecesInStock++
+    applyToKeyAndAssign('players',
+      applyToIndexAndAssign(player,
+        applyToKeyAndAssign('piecesInStock', (n) => n + 1)
+      )
+    )
+  )(state)
 }
 
 /**
@@ -56,3 +72,11 @@ export const conditionalUpdater = (updater) =>
     if (state.error) { return state }
     return u(updater, state)
   }
+
+/**
+ * Apply function to state if it has no error
+ * @param  {fn} Function to apply
+ * @return {state} state, updated or not
+ */
+export const ifNoError = (fn) =>
+  (state) => state.error ? state : fn(state)

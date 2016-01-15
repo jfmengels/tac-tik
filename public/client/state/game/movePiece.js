@@ -13,7 +13,7 @@ const inBetween = (startPos, endPos) =>
 
 const hasBlockingElements = (startPos, endPos, state) =>
   state.pieces
-    .filter(({isBlocking}) => isBlocking)
+    .filter((p) => p.isBlocking)
     .filter(inBetween(startPos, endPos))
     .length > 0
 
