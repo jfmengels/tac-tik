@@ -1,6 +1,6 @@
-import _ from 'lodash'
+import _ from 'lodash/fp'
 
-import { removeAtPosition, conditionalUpdater } from './common'
+import { removeAtPosition, ifNoError, applyToKeyAndAssign, applyToIndexAndAssign } from './common'
 
 const newPiece = (player, pos) => ({
   player,
@@ -9,20 +9,20 @@ const newPiece = (player, pos) => ({
   isAtDestination: false
 })
 
-export default (id, state) => {
+export default _.curry((id, state) => {
   const newPos = id * state.parameters.distanceBetweenPlayers
 
-  const updater = {
-    players: {
-      [id]: {
-        piecesInStock: (n) => n - 1
-      }
-    },
-    pieces: (p) => p.concat(newPiece(id, newPos))
-  }
-
   return _.flow(
-    _.partial(removeAtPosition, newPos),
-    conditionalUpdater(updater)
+    removeAtPosition(newPos),
+    ifNoError(_.flow(
+      // Add new piece to the board
+      applyToKeyAndAssign('pieces', (p) => p.concat(newPiece(id, newPos))),
+      // === state.players[playerToGiveAPieceTo].piecesInStock--
+      applyToKeyAndAssign('players',
+        applyToIndexAndAssign(id,
+          applyToKeyAndAssign('piecesInStock', (n) => n - 1)
+        )
+      )
+    ))
   )(state)
-}
+})

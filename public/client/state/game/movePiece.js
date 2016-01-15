@@ -1,7 +1,6 @@
 import _ from 'lodash/fp'
-import u from 'updeep'
 
-import { atPos, removeAtPosition, conditionalUpdater } from './common'
+import { isAtPos, removeAtPosition, ifNoError, applyToKeyAndAssign } from './common'
 
 const inBetween = (startPos, endPos) =>
   ({pos}) => {
@@ -11,38 +10,31 @@ const inBetween = (startPos, endPos) =>
     return startPos < pos && pos <= endPos
   }
 
-const hasBlockingElements = (startPos, endPos, state) =>
-  state.pieces
-    .filter((p) => p.isBlocking)
-    .filter(inBetween(startPos, endPos))
-    .length > 0
+const hasBlockingElements = (startPos, endPos) =>
+  _.flow(
+    _.get('pieces'),
+    _.filter((p) => p.isBlocking),
+    _.filter(inBetween(startPos, endPos)),
+    (p) => p.length > 0
+  )
 
-
-export default (pos, steps, state) => {
+export default _.curry((pos, steps, state) => {
+  const atPos = isAtPos(pos)
   const newPos = (pos + steps) % (state.parameters.numberOfPlayers * state.parameters.distanceBetweenPlayers)
-  const notAtPos = atPos(false, pos)
 
-  if (hasBlockingElements(pos, newPos, state)) {
-    return u({
+  if (hasBlockingElements(pos, newPos)(state)) {
+    return _.assign({
       error: `Can't remove a blocking piece from the board`
     }, state)
   }
 
-  const updater = {
-    pieces: u.map((piece) => {
-      if (notAtPos(piece)) {
-        return piece
-      }
-      return u({
-        pos: newPos,
-        isBlocking: false
-      }, piece)
-    }),
-    error: null
-  }
-
   return _.flow(
-    _.partial(removeAtPosition, newPos),
-    conditionalUpdater(updater)
+    removeAtPosition(newPos),
+    ifNoError(_.flow(
+      // Add new piece to the board
+      applyToKeyAndAssign('pieces',
+        _.map((p) => !atPos(p) ? p : _.assign({pos: newPos, isBlocking: false}, p))
+      )
+    ))
   )(state)
-}
+})

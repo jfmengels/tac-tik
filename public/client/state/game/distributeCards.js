@@ -1,17 +1,28 @@
-import _ from 'lodash'
-import u from 'updeep'
+import _ from 'lodash/fp'
 
-export default (cards, state) => {
-  const cardsForEachPlayer = _.chunk(_.take(cards, 16), 4)
+import { applyToKeyAndAssign } from './common'
 
-  const updater = {
-    players: (players) => {
-      return players.map((player, index) => {
-        return Object.assign({}, player, {cards: cardsForEachPlayer[index]})
-      })
-    },
-    cardsInDeck: _.takeRight(cards, cards.length - 16)
-  }
+export default _.curry((cards, state) => {
+  const {numberOfPlayers} = state.parameters
+  const nCards = numberOfPlayers * 4
 
-  return u(updater, state)
-}
+  const cardsForEachPlayer = _.flow(
+    _.take(nCards),
+    // _.chunk is not data-last. Should be fixed in the next release of lodash
+    _.partial(_.chunk, _, numberOfPlayers)
+  )(cards)
+
+  return _.flow(
+    // Remove last nCards from deck
+    applyToKeyAndAssign('cardsInDeck', () => _.takeRight(cards.length - nCards, cards)),
+    // players[index] = cardsForEachPlayer[index]
+    applyToKeyAndAssign('players',
+      _.flow(
+        _.zip(cardsForEachPlayer),
+        _.map(([newCards, player]) => {
+          return _.assign({cards: newCards}, player)
+        })
+      )
+    )
+  )(state)
+})

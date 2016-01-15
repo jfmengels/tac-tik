@@ -14,16 +14,16 @@ export const atPos = (wanted, position) =>
   ({pos, isAtDestination}) =>
     (pos === position) === wanted && !isAtDestination
 
-const isAtPos = (position) =>
-  ({pos, isAtDestination}) =>
-    pos === position && !isAtDestination
+export const isAtPos = _.curry((position, {pos, isAtDestination}) =>
+  pos === position && !isAtDestination
+)
 
-const applyToKeyAndAssign = (key, fn) => (state) => {
+export const applyToKeyAndAssign = (key, fn) => (state) => {
   const updatedValue = fn(state[key])
   return _.assign({[key]: updatedValue})(state)
 }
 
-const applyToIndexAndAssign = (index, fn) => (state) => {
+export const applyToIndexAndAssign = (index, fn) => (state) => {
   const updatedValue = fn(state[index])
   return state.map((v, i) => i === index ? updatedValue : v)
 }
@@ -37,7 +37,7 @@ const applyToIndexAndAssign = (index, fn) => (state) => {
  * - State with the piece removed from the board if one was at the given position
  * - State with untouched board but with an error if a blocking piece was at the given position
  */
-export const removeAtPosition = (position, state) => {
+export const removeAtPosition = _.curry((position, state) => {
   const piecesAtGivenPosition = state.pieces.filter(atPos(true, position))
   if (piecesAtGivenPosition.length === 0) {
     return state
@@ -60,7 +60,7 @@ export const removeAtPosition = (position, state) => {
       )
     )
   )(state)
-}
+})
 
 /**
  * Apply updater if state has no error

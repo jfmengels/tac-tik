@@ -33,9 +33,9 @@ const playCardReducer = (state, {playerId, card, cardOptions}) => {
 
   let operation
   if (card.action === 'START' && cardOptions.newPiece === true) {
-    operation = _.partial(putPieceOnBoard, playerId)
+    operation = putPieceOnBoard(playerId)
   } else if (card.action === 'MOVE' || card.action === 'START') {
-    operation = _.partial(movePiece, cardOptions.piece, card.value)
+    operation = movePiece(cardOptions.piece, card.value)
   }
 
   return _.flow(
@@ -47,13 +47,12 @@ const playCardReducer = (state, {playerId, card, cardOptions}) => {
 const partnerId = (id, numberOfPlayers) =>
   (id + (numberOfPlayers / 2)) % numberOfPlayers
 
-const newPlayer = (numberOfPlayers) =>
-  (id) => ({
-    id,
-    piecesInStock: 4,
-    partnerId: partnerId(id, numberOfPlayers),
-    cards: []
-  })
+const newPlayer = _.curry((numberOfPlayers, id) => ({
+  id,
+  piecesInStock: 4,
+  partnerId: partnerId(id, numberOfPlayers),
+  cards: []
+}))
 
 // const piecePosition = {
 //   player: <number>,
