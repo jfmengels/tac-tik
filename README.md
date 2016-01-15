@@ -8,7 +8,7 @@ A proof of concept for slides with conditional paths.
 
 ## Tools
 * [React](https://facebook.github.io/react) for rendering
-* [Redux](https://github.com/rackt/redux) for a predictable app state (with [updeep](https://github.com/substantial/updeep) for immutable data)
+* [Redux](https://github.com/rackt/redux) for a predictable app state
 * [react-router](https://github.com/rackt/react-router) for routing
 * [Babel](http://babeljs.io) for ES201X code
 * [Webpack](http://webpack.github.io) for building the project and for hotloading (serverside rendering coming soon)
@@ -37,7 +37,7 @@ It should now watch the project front-end files, and hot-reload when possible.
 
 ### Redux
 
-[Redux](https://github.com/rackt/redux) is based on the [Flux](https://facebook.github.io/flux) architecture proposed by Facebook. It is a leaner and simpler version of it, by removing some of the abstractions and making use of ideas from functional programming and [Elm](http://elm-lang.org), such as using pure functions for all data updates. The result is an immutable tree-like data structure, that can only be modified by specific pure functions, making it very easy to test and easy to trust. The data's immutability is not enforced by Redux out of the box, but it is in this project using [updeep](https://github.com/substantial/updeep).
+[Redux](https://github.com/rackt/redux) is based on the [Flux](https://facebook.github.io/flux) architecture proposed by Facebook. It is a leaner and simpler version of it, by removing some of the abstractions and making use of ideas from functional programming and [Elm](http://elm-lang.org), such as using pure functions for all data updates. The result is an immutable tree-like data structure, that can only be modified by specific pure functions, making it very easy to test and easy to trust. The data's immutability is not enforced by Redux though.
 
 ### Hot-reload during development (using Webpack)
 
@@ -93,9 +93,7 @@ const reducers = (state, action) => {
   }
 }
 ```
-**A reducer should never alter the current state** or have any other types of side-effects such as dispatching a new action. To make sure of that, we use [updeep](https://github.com/substantial/updeep) to make the state immutable.Note that it only is made immutable in development, and not in production, to avoid performance penalties, so reducers should be well tested to make sure it never alters the state directly.
-
-A reducer should compute and return the new state and it should only do that. Many types of actions can be dispatched in the app, but a reducer should only handle those that it wants to treat and ignore the rest. Ignoring an action here means returning the current state. Having reducers be pure functions, mean that they can be swapped on the fly with hot reloading, and you can use some pretty useful tools when developing (Check out Redux creator [Dan Abramov's talk](https://www.youtube.com/watch?v=xsSnOQynTHs) on this topic).
+**A reducer should never alter the current state** or have any other types of side-effects such as dispatching a new action. A reducer should compute and return the new state and it should only do that. Many types of actions can be dispatched in the app, but a reducer should only handle those that it wants to treat and ignore the rest. Ignoring an action here means returning the current state. Having reducers be pure functions, mean that they can be swapped on the fly with hot reloading, and you can use some pretty useful tools when developing (Check out Redux creator [Dan Abramov's talk](https://www.youtube.com/watch?v=xsSnOQynTHs) on this topic).
 
 #### Constants
 To be able to link actions to reducers, we create constants, such as `LOAD_MODULE_LIST = 'LOAD_MODULE_LIST'`. It is optional in the methodology, but having them has some advantages, such as being able to easily see what actions a top-level state handler handles, or avoiding typos more easily.

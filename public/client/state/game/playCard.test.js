@@ -1,5 +1,4 @@
-import _ from 'lodash'
-import u from 'updeep'
+import _ from 'lodash/fp'
 import { expect } from 'chai'
 
 import reducer, { playCard } from './'
@@ -15,23 +14,12 @@ describe('game - playing a card', () => {
 
   beforeEach(() => {
     startState = reducer(undefined, { type: '@@INIT' })
-    const updater = {
-      players: (players) => {
-        return players.map((player) => {
-          if (player.id !== 2) {
-            return player
-          }
-          const cards = [
-            {value: 10, action: 'START', color: 'blue'},
-            {value: 10, action: 'START', color: 'green'},
-            {value: 10, action: 'START', color: 'red'},
-            {value: 8, action: 'MOVE', color: 'blue'}
-          ]
-          return Object.assign({}, player, {cards})
-        })
-      }
-    }
-    startState = u(updater, startState)
+    startState.players[2].cards = [
+      {value: 10, action: 'START', color: 'blue'},
+      {value: 10, action: 'START', color: 'green'},
+      {value: 10, action: 'START', color: 'red'},
+      {value: 8, action: 'MOVE', color: 'blue'}
+    ]
   })
 
   it(`should remove the played card from the player's hand (first played card)`, () => {

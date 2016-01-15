@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { applyToKeyAndAssign } from './common'
+import { applyTo } from './common'
 
 export default _.curry((cards, state) => {
   const {numberOfPlayers} = state.parameters
@@ -12,17 +12,15 @@ export default _.curry((cards, state) => {
     _.partial(_.chunk, _, numberOfPlayers)
   )(cards)
 
+  const cardsInDeck = _.takeRight(cards.length - nCards, cards)
+
   return _.flow(
     // Remove last nCards from deck
-    applyToKeyAndAssign('cardsInDeck', () => _.takeRight(cards.length - nCards, cards)),
-    // players[index] = cardsForEachPlayer[index]
-    applyToKeyAndAssign('players',
-      _.flow(
-        _.zip(cardsForEachPlayer),
-        _.map(([newCards, player]) => {
-          return _.assign({cards: newCards}, player)
-        })
-      )
-    )
+    _.assign({cardsInDeck}),
+    // players[i] = cardsForEachPlayer[i]
+    applyTo('players', _.flow(
+      _.zip(cardsForEachPlayer),
+      _.map(([newCards, player]) => _.assign({cards: newCards}, player))
+    ))
   )(state)
 })

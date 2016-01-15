@@ -1,9 +1,11 @@
-import _ from 'lodash'
-import u from 'updeep'
+import _ from 'lodash/fp'
 import { expect } from 'chai'
 
 import reducer from './'
+import { applyTo } from './common'
 import distributeCards from './distributeCards'
+
+const unique = _.flow(_.flatten, _.uniq)
 
 describe('game - distributing cards', () => {
   let startState
@@ -18,8 +20,8 @@ describe('game - distributing cards', () => {
       expect(cards.length).to.equal(4)
       return cards
     })
-    expect(_.uniq(_.flatten(allPlayerCards)).length).to.equal(16)
-    expect(_.uniq(_.flatten(allPlayerCards.concat(startState.cardsInDeck))).length).to.equal(48)
+    expect(unique(allPlayerCards).length).to.equal(16)
+    expect(unique(allPlayerCards.concat(startState.cardsInDeck)).length).to.equal(48)
   })
 
   it('should deal 4 cards to every player and remove them from the deck', () => {
@@ -30,23 +32,21 @@ describe('game - distributing cards', () => {
       expect(cards.length).to.equal(4)
       return cards
     })
-    expect(_.uniq(_.flatten(allPlayerCards)).length).to.equal(16)
-    expect(_.uniq(_.flatten(allPlayerCards.concat(state.cardsInDeck))).length).to.equal(32)
+    expect(unique(allPlayerCards).length).to.equal(16)
+    expect(unique(allPlayerCards.concat(state.cardsInDeck)).length).to.equal(32)
   })
 
   it('should deplete cardsInDeck at every call', () => {
-    const removeCardsUpdater = {
-      players: (players) => {
-        return players.map((player) => {
-          return Object.assign({}, player, {cards: []})
-        })
-      }
-    }
-    const removeCardsFromAPlayersHand = (state) => u(removeCardsUpdater, state)
+    const removeCardsFromPlayersHand = applyTo('players', _.map(
+      _.assign({cards: []})
+    ))
 
-    let state = distributeCards(startState.cardsInDeck, startState)
-    state = removeCardsFromAPlayersHand(state)
-    state = distributeCards(state.cardsInDeck, state)
+    const tmpState = _.flow(
+      distributeCards(startState.cardsInDeck),
+      removeCardsFromPlayersHand
+    )(startState)
+
+    const state = distributeCards(tmpState.cardsInDeck, tmpState)
 
     expect(state.cardsInDeck.length).to.equal(0)
   })

@@ -1,5 +1,4 @@
 import _ from 'lodash/fp'
-import u from 'updeep'
 
 /**
  * Returns a function that will tell whether a piece matches the position requirement.
@@ -18,15 +17,10 @@ export const isAtPos = _.curry((position, {pos, isAtDestination}) =>
   pos === position && !isAtDestination
 )
 
-export const applyToKeyAndAssign = (key, fn) => (state) => {
-  const updatedValue = fn(state[key])
-  return _.assign({[key]: updatedValue})(state)
-}
-
-export const applyToIndexAndAssign = (index, fn) => (state) => {
-  const updatedValue = fn(state[index])
-  return state.map((v, i) => i === index ? updatedValue : v)
-}
+export const applyTo = _.curry((selector, fn, obj) => {
+  const value = fn(_.get(selector, obj))
+  return _.set(value, selector, obj)
+})
 
 /**
  * Remove a piece from the board if one sits at the given position.
@@ -50,28 +44,12 @@ export const removeAtPosition = _.curry((position, state) => {
 
   return _.flow(
     // Remove piece at given position
-    applyToKeyAndAssign('pieces',
+    applyTo('pieces',
       _.filter(_.negate(isAtPos(position)))
     ),
-    // === state.players[playerToGiveAPieceTo].piecesInStock++
-    applyToKeyAndAssign('players',
-      applyToIndexAndAssign(player,
-        applyToKeyAndAssign('piecesInStock', (n) => n + 1)
-      )
-    )
+    applyTo(`players[${player}].piecesInStock`, (n) => n + 1)
   )(state)
 })
-
-/**
- * Apply updater if state has no error
- * @param  {updeep object} updater State updater to apply
- * @return {state} state, updated or not
- */
-export const conditionalUpdater = (updater) =>
-  (state) => {
-    if (state.error) { return state }
-    return u(updater, state)
-  }
 
 /**
  * Apply function to state if it has no error

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _ from 'lodash/fp'
 
 const starters = [1, 10].map((value) => ({value, action: 'START'}))
 const permuters = {value: 'PERMUTE', action: 'PERMUTE'}
@@ -9,12 +9,10 @@ const cards = [].concat(starters, permuters, movers, multiMover)
 
 const colors = ['red', 'blue', 'green', 'yellow']
 
-const allCards = _.flatten(
-  cards.map(
-    (card) => colors.map(
-      (color) => Object.assign({}, card, {color})
-    )
-  )
+// allCards: cartesian product of colors and cards
+const allCards = _.flatMap(
+  (color) => _.map(_.assign({color}), cards),
+  colors
 )
 
 export default () => _.shuffle(allCards)

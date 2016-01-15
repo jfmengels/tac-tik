@@ -1,12 +1,8 @@
 import _ from 'lodash'
-import u from 'updeep'
-
-const immutable = (state) => u(state, null)
-
 const noopFunc = (state, action) => state
 
 export const createReducer = (initialState, reducerFuncs) => {
-  return (state = immutable(initialState), action) => {
+  return (state = initialState, action) => {
     const func = reducerFuncs[action && action.type] || noopFunc
     return func(state, action)
   }
@@ -52,14 +48,4 @@ export const mergeActions = (stateHandlers) => {
     throw new Error('Conflicting action names')
   }
   return mergedActions
-}
-
-
-export const updeepReducer = (functions) => {
-  const fns = typeof functions === 'function' ? [functions] : functions
-
-  return (state, action) => fns.reduce(
-    (tmpState, fn) => u(fn(action), tmpState),
-    state
-  )
 }

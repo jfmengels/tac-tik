@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { isAtPos, removeAtPosition, ifNoError, applyToKeyAndAssign } from './common'
+import { isAtPos, removeAtPosition, ifNoError, applyTo } from './common'
 
 const inBetween = (startPos, endPos) =>
   ({pos}) => {
@@ -31,10 +31,12 @@ export default _.curry((pos, steps, state) => {
   return _.flow(
     removeAtPosition(newPos),
     ifNoError(_.flow(
-      // Add new piece to the board
-      applyToKeyAndAssign('pieces',
-        _.map((p) => !atPos(p) ? p : _.assign({pos: newPos, isBlocking: false}, p))
-      )
+      applyTo('pieces', _.map(
+        (p) => {
+          if (!atPos(p)) { return p }
+          return _.assign({pos: newPos, isBlocking: false}, p)
+        }
+      ))
     ))
   )(state)
 })

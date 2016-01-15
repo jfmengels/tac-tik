@@ -1,35 +1,27 @@
-import _ from 'lodash'
-import u from 'updeep'
+import _ from 'lodash/fp'
 
 import createNewDeck from './cards'
 import distributeCards from './distributeCards'
 import putPieceOnBoard from './putPieceOnBoard'
 import movePiece from './movePiece'
-import { conditionalUpdater } from './common'
+import { ifNoError, applyTo } from './common'
 import { createReducer } from '../utils'
 
 const prefix = 'game/'
 const PLAY_CARD = prefix + 'PLAY_CARD'
 
 const playCardReducer = (state, {playerId, card, cardOptions}) => {
-  const foundCard = _.find(state.players[playerId].cards, card)
+  const foundCard = _.find(card, state.players[playerId].cards)
   if (!foundCard) {
-    return u({
-      error: `Could not play card absent from player's hand`
-    }, state)
+    return _.assign({error: `Could not play card absent from player's hand`}, state)
   }
 
-  const updater = {
-    players: (players) => {
-      return players.map((player) => {
-        if (player.id !== playerId) {
-          return player
-        }
-        const filteredCards = player.cards.filter((c) => !_.isEqual(c, card))
-        return Object.assign({}, player, {cards: filteredCards})
-      })
-    }
-  }
+  const selector = `players[${playerId}].cards`
+  const update = applyTo(selector, _.filter(_.flow(
+    // _.isEqual is not data-last. Should be fixed in the next release of lodash
+    _.partial(_.isEqual, _, card),
+    (b) => !b
+  )))
 
   let operation
   if (card.action === 'START' && cardOptions.newPiece === true) {
@@ -40,7 +32,7 @@ const playCardReducer = (state, {playerId, card, cardOptions}) => {
 
   return _.flow(
     operation,
-    conditionalUpdater(updater)
+    ifNoError(update)
   )(state)
 }
 

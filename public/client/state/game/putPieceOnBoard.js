@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { removeAtPosition, ifNoError, applyToKeyAndAssign, applyToIndexAndAssign } from './common'
+import { removeAtPosition, ifNoError, applyTo } from './common'
 
 const newPiece = (player, pos) => ({
   player,
@@ -16,13 +16,8 @@ export default _.curry((id, state) => {
     removeAtPosition(newPos),
     ifNoError(_.flow(
       // Add new piece to the board
-      applyToKeyAndAssign('pieces', (p) => p.concat(newPiece(id, newPos))),
-      // === state.players[playerToGiveAPieceTo].piecesInStock--
-      applyToKeyAndAssign('players',
-        applyToIndexAndAssign(id,
-          applyToKeyAndAssign('piecesInStock', (n) => n - 1)
-        )
-      )
+      applyTo('pieces', (p) => p.concat(newPiece(id, newPos))),
+      applyTo(`players[${id}].piecesInStock`, (n) => n -1)
     ))
   )(state)
 })
