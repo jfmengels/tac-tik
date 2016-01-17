@@ -1,3 +1,4 @@
+import _ from 'lodash/fp'
 import expect from 'expect'
 
 import reducer from './'
@@ -41,5 +42,27 @@ describe('game - initialization', () => {
   it('should have board with zero pieces on the board', () => {
     expect(state.pieces).toBeA('array')
     expect(state.pieces.length).toEqual(0)
+  })
+
+  it(`should have 4 cards in every player's hand`, () => {
+    expect(state.players[0].cards.length).toEqual(4)
+    expect(state.players[1].cards.length).toEqual(4)
+    expect(state.players[2].cards.length).toEqual(4)
+    expect(state.players[3].cards.length).toEqual(4)
+  })
+
+  it('should have 32 cards left in deck', () => {
+    expect(state.cardsInDeck.length).toEqual(32)
+  })
+
+  it('should only have unique cards in game', () => {
+    const unique = _.flow(_.flatten, _.uniq)
+
+    const allPlayerCards = state.players.map(({cards}) => {
+      expect(cards.length).toEqual(4)
+      return cards
+    })
+    expect(unique(allPlayerCards).length).toEqual(16)
+    expect(unique(allPlayerCards.concat(state.cardsInDeck)).length).toEqual(48)
   })
 })

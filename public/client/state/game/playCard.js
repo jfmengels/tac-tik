@@ -3,7 +3,7 @@ import _ from 'lodash/fp'
 import { ifNoError, applyTo } from './utils'
 import { putPieceOnBoard, movePiece } from './boardManipulation'
 
-export default (state, {playerId, card, cardOptions}) => {
+export default ({playerId, card, cardOptions}, state) => {
   const foundCard = _.find(card, state.players[playerId].cards)
   if (!foundCard) {
     return _.assign({error: `Could not play card absent from player's hand`}, state)

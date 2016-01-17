@@ -1,125 +1,138 @@
-import _ from 'lodash/fp'
 import expect from 'expect'
 
-import reducer, { playCard } from './'
-
-const playStartCard = (state) => {
-  const card = state.players[2].cards[0] // 10/start card
-  const cardOptions = { newPiece: true }
-  return reducer(state, playCard(2, card, cardOptions))
-}
+import playCard from './playCard'
 
 describe('game - playing a card', () => {
   let startState
 
   beforeEach(() => {
-    startState = reducer(undefined, { type: '@@INIT' })
-    startState.players[2].cards = [
+    startState = {
+      pieces: [{
+        pos: 2,
+        player: 0,
+        isBlocking: true,
+        isAtDestination: false
+      }, {
+        pos: 16,
+        player: 1,
+        isBlocking: true,
+        isAtDestination: false
+      }],
+      players: [
+        {
+          piecesInStock: 3,
+          cards: [
+            {value: 10, action: 'START', color: 'blue'},
+            {value: 10, action: 'START', color: 'green'},
+            {value: 10, action: 'START', color: 'red'},
+            {value: 8, action: 'MOVE', color: 'blue'}
+          ]
+        },
+        {
+          piecesInStock: 3,
+          cards: [
+            {value: 1, action: 'START', color: 'red'},
+            {value: 1, action: 'START', color: 'green'},
+            {value: 1, action: 'START', color: 'red'},
+            {value: 6, action: 'MOVE', color: 'blue'}
+          ]
+        },
+        {piecesInStock: 4, cards: []},
+        {piecesInStock: 4, cards: []}
+      ],
+      parameters: {
+        distanceBetweenPlayers: 16,
+        numberOfPlayers: 4
+      },
+      error: null
+    }
+  })
+
+  it(`should remove the played card from the player's hand`, () => {
+    const previousCards = startState.players[0].cards
+    const card = previousCards[1]
+    const cardOptions = { newPiece: true }
+
+    const state = playCard({playerId: 0, card, cardOptions}, startState)
+
+    expect(state.players[0].cards).toEqual([
       {value: 10, action: 'START', color: 'blue'},
-      {value: 10, action: 'START', color: 'green'},
       {value: 10, action: 'START', color: 'red'},
       {value: 8, action: 'MOVE', color: 'blue'}
-    ]
-  })
-
-  it(`should remove the played card from the player's hand (first played card)`, () => {
-    const previousCards = startState.players[2].cards
-    const card = previousCards[0]
-
-    const state = playStartCard(startState)
-
-    const newCards = state.players[2].cards
-    expect(newCards.length).toEqual(3)
-    expect(_.find(newCards, card)).toEqual(undefined)
-    expect([card].concat(newCards), 'value')
-      .toEqual(previousCards, 'value')
-  })
-
-  it(`should remove the played card from the player's hand (second played card)`, () => {
-    const tmpState = playStartCard(startState)
-    const previousCards = tmpState.players[2].cards
-    const card = previousCards[2]
-    const cardOptions = { newPiece: false, piece: 2 * 16 }
-
-    const state = reducer(tmpState, playCard(2, card, cardOptions))
-
-    const newCards = state.players[2].cards
-    expect(newCards.length).toEqual(2)
-    expect(_.find(newCards, card)).toEqual(undefined)
-    expect(newCards.concat(card), 'value')
-      .toEqual(previousCards, 'value')
+    ])
   })
 
   it(`should put a piece on the board from a played 'start' card`, () => {
-    const state = playStartCard(startState)
+    const previousCards = startState.players[0].cards
+    const card = previousCards[1]
+    const cardOptions = { newPiece: true }
 
-    expect(state.players[2].piecesInStock).toEqual(3)
-    expect(state.pieces.length).toEqual(1)
-    const piece = state.pieces[0]
-    expect(piece.player).toEqual(2)
-    expect(piece.pos).toEqual(2 * 16)
-    expect(piece.isBlocking).toEqual(true)
-    expect(piece.isAtDestination).toEqual(false)
+    const state = playCard({playerId: 0, card, cardOptions}, startState)
+
+    expect(state.error).toEqual(null)
+    expect(state.players[0].piecesInStock).toEqual(2)
+    expect(state.pieces.length).toEqual(3)
+    expect(state.pieces[2]).toEqual({
+      pos: 0,
+      player: 0,
+      isBlocking: true,
+      isAtDestination: false
+    })
   })
 
   it(`should move a piece on the board from a played 'move' card`, () => {
-    // Setup: put a piece on the board
-    const tmpState = playStartCard(startState)
-    const card = tmpState.players[2].cards[0] // 10/start card
-    const cardOptions = { newPiece: false, piece: 2 * 16 }
+    const card = startState.players[0].cards[0] // 10/start card
+    const cardOptions = { newPiece: false, piece: 2 }
 
-    const state = reducer(tmpState, playCard(2, card, cardOptions))
+    const state = playCard({playerId: 0, card, cardOptions}, startState)
 
     expect(state.error).toEqual(null)
-    expect(state.players[2].piecesInStock).toEqual(3)
-    expect(state.pieces.length).toEqual(1)
-    const piece = state.pieces[0]
-    expect(piece.player).toEqual(2)
-    expect(piece.pos).toEqual(2 * 16 + 10)
-    expect(piece.isBlocking).toEqual(false)
-    expect(piece.isAtDestination).toEqual(false)
+    expect(state.players[0].piecesInStock).toEqual(3)
+    expect(state.pieces.length).toEqual(2)
+    expect(state.pieces[0]).toEqual({
+      pos: 12,
+      player: 0,
+      isBlocking: false,
+      isAtDestination: false
+    })
   })
 
-  it(`should move a piece on the board from a played 'start' card`, () => {
-    // Setup: put a piece on the board
-    const tmpState = playStartCard(startState)
-    const card = tmpState.players[2].cards[2] // 8/move card
-    const cardOptions = { piece: 2 * 16 }
+  it(`should move a piece on the board from a played 'move' card`, () => {
+    const card = startState.players[0].cards[3] // 8/move card
+    const cardOptions = { piece: 2 }
 
-    const state = reducer(tmpState, playCard(2, card, cardOptions))
+    const state = playCard({playerId: 0, card, cardOptions}, startState)
 
     expect(state.error).toEqual(null)
-    expect(state.players[2].piecesInStock).toEqual(3)
-    expect(state.pieces.length).toEqual(1)
-    const piece = state.pieces[0]
-    expect(piece.player).toEqual(2)
-    expect(piece.pos).toEqual(2 * 16 + 8)
-    expect(piece.isBlocking).toEqual(false)
-    expect(piece.isAtDestination).toEqual(false)
+    expect(state.pieces[0]).toEqual({
+      pos: 10,
+      player: 0,
+      isBlocking: false,
+      isAtDestination: false
+    })
   })
 
   it(`should return state with an error and cancel card when playing invalid action`, () => {
-    // Setup: put a piece on the board
-    const tmpState = playStartCard(startState)
-    const card = tmpState.players[2].cards[0] // 10/start card
+    const card = startState.players[1].cards[0] // 1/start card
     const cardOptions = { newPiece: true }
 
-    // A blocking piece should make he action invalid
-    const state = reducer(tmpState, playCard(2, card, cardOptions))
+    const state = playCard({playerId: 1, card, cardOptions}, startState)
 
-    expect(state.error).toEqual(`Can't remove a blocking piece from the board`)
-    expect(state.players).toEqual(state.players, 'player info should not have been modified')
-    expect(state.pieces).toEqual(state.pieces, 'board pieces should not have been modified')
+    expect(state.error).toEqual(
+      `Can't remove a blocking piece from the board`,
+      'Action should be invalid because of a blocking piece')
+    expect(state.pieces).toEqual(startState.pieces)
+    expect(state.players).toEqual(startState.players)
   })
 
   it(`should return state with an error and cancel card when playing a card not in the player's hand`, () => {
     const card = {value: 10, action: 'START', color: 'yellow'}
     const cardOptions = { newPiece: true }
 
-    const state = reducer(startState, playCard(2, card, cardOptions))
+    const state = playCard({playerId: 1, card, cardOptions}, startState)
 
     expect(state.error).toEqual(`Could not play card absent from player's hand`)
-    expect(state.players).toEqual(state.players, 'player info should not have been modified')
-    expect(state.pieces).toEqual(state.pieces, 'board pieces should not have been modified')
+    expect(state.pieces).toEqual(startState.pieces)
+    expect(state.players).toEqual(startState.players)
   })
 })

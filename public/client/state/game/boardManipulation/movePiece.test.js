@@ -1,113 +1,104 @@
-import _ from 'lodash/fp'
 import expect from 'expect'
 
-import reducer from '../'
-import putPieceOnBoard from './putPieceOnBoard'
 import movePiece from './movePiece'
 
 describe('game - moving a piece', () => {
   let startState
 
   beforeEach(() => {
-    startState = putPieceOnBoard(2, reducer(undefined, { type: '@@INIT' }))
+    startState = {
+      pieces: [{
+        pos: 32,
+        player: 2,
+        isBlocking: true
+      }, {
+        pos: 3,
+        player: 0,
+        isBlocking: false
+      }, {
+        pos: 8,
+        player: 1,
+        isBlocking: false
+      }, {
+        pos: 16,
+        player: 1,
+        isBlocking: true
+      }],
+      players: [
+        {piecesInStock: 3},
+        {piecesInStock: 2},
+        {piecesInStock: 3},
+        {piecesInStock: 4}
+      ],
+      parameters: {
+        distanceBetweenPlayers: 16,
+        numberOfPlayers: 4
+      },
+      error: null
+    }
   })
 
   it('should be able to move a piece forward and set it as non-blocking', () => {
-    const state = movePiece(2 * 16, 5, startState)
-    expect(state.pieces[0].pos).toEqual(2 * 16 + 5)
+    const state = movePiece(32, 5, startState)
+
+    expect(state.error).toEqual(null)
+    expect(state.pieces[0].pos).toEqual(37)
     expect(state.pieces[0].isBlocking).toEqual(false)
   })
 
   it('should not re-set non-blocking piece to blocking', () => {
-    const tmpState = movePiece(2 * 16, 5, startState)
-    expect(tmpState.pieces[0].isBlocking).toEqual(false)
+    startState.pieces[0].pos = 37
+    startState.pieces[0].blocking = false
 
-    const state = movePiece(2 * 16 + 5, 8, tmpState)
-    expect(state.pieces[0].pos).toEqual(2 * 16 + 13)
+    const state = movePiece(37, 8, startState)
+
+    expect(state.pieces[0].pos).toEqual(45)
     expect(state.pieces[0].isBlocking).toEqual(false)
   })
 
   it('should be able to loop over the board', () => {
-    const state = movePiece(2 * 16, 41, startState)
+    const state = movePiece(32, 41, startState)
+
     expect(state.pieces[0].pos).toEqual(9)
   })
 
-  it('should not remove a non-blocking piece that is being passed over', () => {
-    const tmpState = _.cloneDeep(putPieceOnBoard(0, startState))
-    tmpState.pieces[0].pos = 5
-    tmpState.pieces[0].isBlocking = false
+  it('should not remove non-blocking pieces that are walked passed over', () => {
+    const state = movePiece(3, 9, startState)
 
-    const state = movePiece(0, 9, tmpState)
-    expect(state.pieces.length).toEqual(2)
-    expect(state.pieces.filter((p) => p.player === 0 && p.pos === 9).length).toEqual(1)
-    expect(state.pieces.filter((p) => p.player === 2 && p.pos === 5).length).toEqual(1)
+    expect(state.pieces[1].pos).toEqual(12)
+    expect(state.pieces.length).toEqual(startState.pieces.length)
   })
 
   it('should remove a non-blocking piece that is at the destination', () => {
-    const tmpState = _.cloneDeep(putPieceOnBoard(0, startState))
-    tmpState.pieces[0].pos = 5
-    tmpState.pieces[0].isBlocking = false
+    const state = movePiece(3, 5, startState)
 
-    const state = movePiece(0, 5, tmpState)
-    expect(state.pieces.length).toEqual(1)
-    expect(state.pieces[0].pos).toEqual(5)
-    expect(state.pieces[0].player).toEqual(0)
+    expect(state.pieces.length).toEqual(startState.pieces.length - 1)
+    expect(state.pieces[1].pos).toEqual(8)
+    expect(state.pieces[1].player).toEqual(0)
+    expect(state.players[1].piecesInStock).toEqual(startState.players[1].piecesInStock + 1)
   })
 
   it('should set an error if a blocking piece is at the destination', () => {
-    const tmpState = _.cloneDeep(putPieceOnBoard(0, startState))
-    const pos = 2 * 16 - 5
-    tmpState.pieces[1].pos = pos
-    tmpState.pieces[1].isBlocking = false
+    const state = movePiece(3, 13, startState)
 
-    const state = movePiece(pos, 5, tmpState)
-    expect(state.pieces.filter((p) => p.player === 0 && p.pos === pos).length).toEqual(1)
-    expect(state.pieces.filter((p) => p.player === 2 && p.pos === 2 * 16).length).toEqual(1)
-    expect(state.pieces.length).toEqual(2)
     expect(state.error).toEqual(`Can't remove a blocking piece from the board`)
+    expect(state.pieces).toEqual(startState.pieces)
+    expect(state.players).toEqual(startState.players)
   })
 
   it('should set an error if a blocking piece is on the path (not looping the board)', () => {
-    const tmpState = _.cloneDeep(putPieceOnBoard(0, startState))
-    const pos = 2 * 16 - 3
-    tmpState.pieces[1].pos = pos
-    tmpState.pieces[1].isBlocking = false
+    const state = movePiece(3, 16, startState)
 
-    const state = movePiece(pos, 5, tmpState)
-    expect(state.pieces.filter((p) => p.player === 0 && p.pos === pos).length).toEqual(1)
-    expect(state.pieces.filter((p) => p.player === 2 && p.pos === 2 * 16).length).toEqual(1)
-    expect(state.pieces.length).toEqual(2)
     expect(state.error).toEqual(`Can't remove a blocking piece from the board`)
+    expect(state.pieces).toEqual(startState.pieces)
+    expect(state.players).toEqual(startState.players)
   })
 
   it('should set an error if a blocking piece is at destination (looping the board)', () => {
-    const tmpState = _.cloneDeep(putPieceOnBoard(0, startState))
-    const pos = 4 * 16 - 5
-    tmpState.pieces[0].pos = pos
-    tmpState.pieces[0].isBlocking = false
+    const state = movePiece(16, 16, startState)
 
-    const state = movePiece(pos, 5, tmpState)
-    expect(state.pieces.filter((p) => p.player === 2 && p.pos === pos).length).toEqual(1)
-    expect(state.pieces.filter((p) => p.player === 0 && p.pos === 0).length).toEqual(1)
-    expect(state.pieces.length).toEqual(2)
     expect(state.error).toEqual(`Can't remove a blocking piece from the board`)
-  })
-
-  it('should remove a piece if one is present at the starting position', () => {
-    const tmpState = _.cloneDeep(startState)
-    tmpState.pieces[0].pos = 0
-    tmpState.pieces[0].isBlocking = false
-
-    const state = putPieceOnBoard(0, tmpState)
-
-    expect(state.players[2].piecesInStock).toEqual(4)
-    expect(state.players[0].piecesInStock).toEqual(3)
-    expect(state.pieces.length).toEqual(1)
-
-    const piece = state.pieces[0]
-    expect(piece.player).toEqual(0)
-    expect(piece.isBlocking).toEqual(true)
-    expect(piece.pos).toEqual(0)
-    expect(piece.isAtDestination).toEqual(false)
+    expect(state.pieces).toEqual(startState.pieces)
+    expect(state.players).toEqual(startState.players)
   })
 })
