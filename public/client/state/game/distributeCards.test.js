@@ -2,7 +2,7 @@ import _ from 'lodash/fp'
 import { expect } from 'chai'
 
 import reducer from './'
-import { applyTo } from './common'
+import { applyTo } from './utils'
 import distributeCards from './distributeCards'
 
 const unique = _.flow(_.flatten, _.uniq)

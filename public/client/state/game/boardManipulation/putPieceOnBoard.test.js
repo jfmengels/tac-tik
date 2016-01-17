@@ -1,7 +1,7 @@
-import _ from 'lodash'
+import _ from 'lodash/fp'
 import { expect } from 'chai'
 
-import reducer from './'
+import reducer from '../'
 import putPieceOnBoard from './putPieceOnBoard'
 
 describe('game - starting a piece', () => {

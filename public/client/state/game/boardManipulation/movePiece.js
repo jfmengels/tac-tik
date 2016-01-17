@@ -1,16 +1,16 @@
 import _ from 'lodash/fp'
 
-import { isAtPos, removeAtPosition, ifNoError, applyTo } from './common'
+import { isAtPos, ifNoError, applyTo } from '../utils'
+import removePiece from './removePiece'
 
-const inBetween = (startPos, endPos) =>
-  ({pos}) => {
-    if (endPos < startPos) { // Looping the board
-      return pos <= endPos || startPos < pos
-    }
-    return startPos < pos && pos <= endPos
+const inBetween = _.curry((startPos, endPos, {pos}) => {
+  if (endPos < startPos) { // Looping the board
+    return pos <= endPos || startPos < pos
   }
+  return startPos < pos && pos <= endPos
+})
 
-const hasBlockingElements = (startPos, endPos) =>
+const isBlocked = (startPos, endPos) =>
   _.flow(
     _.get('pieces'),
     _.filter((p) => p.isBlocking),
@@ -22,21 +22,21 @@ export default _.curry((pos, steps, state) => {
   const atPos = isAtPos(pos)
   const newPos = (pos + steps) % (state.parameters.numberOfPlayers * state.parameters.distanceBetweenPlayers)
 
-  if (hasBlockingElements(pos, newPos)(state)) {
+  if (isBlocked(pos, newPos)(state)) {
     return _.assign({
       error: `Can't remove a blocking piece from the board`
     }, state)
   }
 
   return _.flow(
-    removeAtPosition(newPos),
-    ifNoError(_.flow(
+    removePiece(newPos),
+    ifNoError(
       applyTo('pieces', _.map(
         (p) => {
           if (!atPos(p)) { return p }
           return _.assign({pos: newPos, isBlocking: false}, p)
         }
       ))
-    ))
+    )
   )(state)
 })

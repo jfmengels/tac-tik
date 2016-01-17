@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { applyTo } from './common'
+import { applyTo } from './utils'
 
 export default _.curry((cards, state) => {
   const {numberOfPlayers} = state.parameters
