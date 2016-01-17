@@ -1,5 +1,5 @@
 import _ from 'lodash/fp'
-import { expect } from 'chai'
+import expect from 'expect'
 
 import reducer, { playCard } from './'
 
@@ -29,10 +29,10 @@ describe('game - playing a card', () => {
     const state = playStartCard(startState)
 
     const newCards = state.players[2].cards
-    expect(newCards.length).to.equal(3)
-    expect(_.find(newCards, card)).to.equal(undefined)
+    expect(newCards.length).toEqual(3)
+    expect(_.find(newCards, card)).toEqual(undefined)
     expect([card].concat(newCards), 'value')
-      .to.deep.equal(previousCards, 'value')
+      .toEqual(previousCards, 'value')
   })
 
   it(`should remove the played card from the player's hand (second played card)`, () => {
@@ -44,22 +44,22 @@ describe('game - playing a card', () => {
     const state = reducer(tmpState, playCard(2, card, cardOptions))
 
     const newCards = state.players[2].cards
-    expect(newCards.length).to.equal(2)
-    expect(_.find(newCards, card)).to.equal(undefined)
+    expect(newCards.length).toEqual(2)
+    expect(_.find(newCards, card)).toEqual(undefined)
     expect(newCards.concat(card), 'value')
-      .to.deep.equal(previousCards, 'value')
+      .toEqual(previousCards, 'value')
   })
 
   it(`should put a piece on the board from a played 'start' card`, () => {
     const state = playStartCard(startState)
 
-    expect(state.players[2].piecesInStock).to.equal(3)
-    expect(state.pieces.length).to.equal(1)
+    expect(state.players[2].piecesInStock).toEqual(3)
+    expect(state.pieces.length).toEqual(1)
     const piece = state.pieces[0]
-    expect(piece.player).to.equal(2)
-    expect(piece.pos).to.equal(2 * 16)
-    expect(piece.isBlocking).to.equal(true)
-    expect(piece.isAtDestination).to.equal(false)
+    expect(piece.player).toEqual(2)
+    expect(piece.pos).toEqual(2 * 16)
+    expect(piece.isBlocking).toEqual(true)
+    expect(piece.isAtDestination).toEqual(false)
   })
 
   it(`should move a piece on the board from a played 'move' card`, () => {
@@ -70,14 +70,14 @@ describe('game - playing a card', () => {
 
     const state = reducer(tmpState, playCard(2, card, cardOptions))
 
-    expect(state.error).to.equal(null)
-    expect(state.players[2].piecesInStock).to.equal(3)
-    expect(state.pieces.length).to.equal(1)
+    expect(state.error).toEqual(null)
+    expect(state.players[2].piecesInStock).toEqual(3)
+    expect(state.pieces.length).toEqual(1)
     const piece = state.pieces[0]
-    expect(piece.player).to.equal(2)
-    expect(piece.pos).to.equal(2 * 16 + 10)
-    expect(piece.isBlocking).to.equal(false)
-    expect(piece.isAtDestination).to.equal(false)
+    expect(piece.player).toEqual(2)
+    expect(piece.pos).toEqual(2 * 16 + 10)
+    expect(piece.isBlocking).toEqual(false)
+    expect(piece.isAtDestination).toEqual(false)
   })
 
   it(`should move a piece on the board from a played 'start' card`, () => {
@@ -88,14 +88,14 @@ describe('game - playing a card', () => {
 
     const state = reducer(tmpState, playCard(2, card, cardOptions))
 
-    expect(state.error).to.equal(null)
-    expect(state.players[2].piecesInStock).to.equal(3)
-    expect(state.pieces.length).to.equal(1)
+    expect(state.error).toEqual(null)
+    expect(state.players[2].piecesInStock).toEqual(3)
+    expect(state.pieces.length).toEqual(1)
     const piece = state.pieces[0]
-    expect(piece.player).to.equal(2)
-    expect(piece.pos).to.equal(2 * 16 + 8)
-    expect(piece.isBlocking).to.equal(false)
-    expect(piece.isAtDestination).to.equal(false)
+    expect(piece.player).toEqual(2)
+    expect(piece.pos).toEqual(2 * 16 + 8)
+    expect(piece.isBlocking).toEqual(false)
+    expect(piece.isAtDestination).toEqual(false)
   })
 
   it(`should return state with an error and cancel card when playing invalid action`, () => {
@@ -107,9 +107,9 @@ describe('game - playing a card', () => {
     // A blocking piece should make he action invalid
     const state = reducer(tmpState, playCard(2, card, cardOptions))
 
-    expect(state.error).to.equal(`Can't remove a blocking piece from the board`)
-    expect(state.players).to.deep.equal(state.players, 'player info should not have been modified')
-    expect(state.pieces).to.deep.equal(state.pieces, 'board pieces should not have been modified')
+    expect(state.error).toEqual(`Can't remove a blocking piece from the board`)
+    expect(state.players).toEqual(state.players, 'player info should not have been modified')
+    expect(state.pieces).toEqual(state.pieces, 'board pieces should not have been modified')
   })
 
   it(`should return state with an error and cancel card when playing a card not in the player's hand`, () => {
@@ -118,8 +118,8 @@ describe('game - playing a card', () => {
 
     const state = reducer(startState, playCard(2, card, cardOptions))
 
-    expect(state.error).to.equal(`Could not play card absent from player's hand`)
-    expect(state.players).to.deep.equal(state.players, 'player info should not have been modified')
-    expect(state.pieces).to.deep.equal(state.pieces, 'board pieces should not have been modified')
+    expect(state.error).toEqual(`Could not play card absent from player's hand`)
+    expect(state.players).toEqual(state.players, 'player info should not have been modified')
+    expect(state.pieces).toEqual(state.pieces, 'board pieces should not have been modified')
   })
 })

@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import expect from 'expect'
 import { stringifyLocation } from './'
 
 describe('utils', () => {
@@ -21,7 +21,7 @@ describe('utils', () => {
 
     it('should return path', () => {
       const result = stringifyLocation(location)
-      expect(result).to.equal('/some/path?a=2&b=3')
+      expect(result).toEqual('/some/path?a=2&b=3')
     })
   })
 })

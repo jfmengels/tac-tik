@@ -10,13 +10,12 @@ const inBetween = _.curry((startPos, endPos, {pos}) => {
   return startPos < pos && pos <= endPos
 })
 
-const isBlocked = (startPos, endPos) =>
-  _.flow(
-    _.get('pieces'),
-    _.filter((p) => p.isBlocking),
-    _.filter(inBetween(startPos, endPos)),
-    (p) => p.length > 0
-  )
+const isBlocked = (startPos, endPos) => _.flow(
+  _.get('pieces'),
+  _.filter((p) => p.isBlocking),
+  _.filter(inBetween(startPos, endPos)),
+  (p) => p.length > 0
+)
 
 export default _.curry((pos, steps, state) => {
   const atPos = isAtPos(pos)
