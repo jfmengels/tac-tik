@@ -9,7 +9,7 @@ export default ({playerId, card, cardOptions}, state) => {
     return _.assign({error: `Could not play card absent from player's hand`}, state)
   }
 
-  const selector = `players[${playerId}].cards`
+  const selector = ['players', playerId, 'cards']
   // _.isEqual is not data-last. Should be fixed in the next release of lodash
   const update = applyTo(selector, _.remove(_.partial(_.isEqual, _, card)))
 

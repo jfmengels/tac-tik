@@ -25,7 +25,7 @@ export default _.curry((position, state) => {
 
   return _.flow(
     // Put a piece back in the owner's stock
-    applyTo(`players[${player}].piecesInStock`, (n) => n + 1),
+    applyTo(['players', player, 'piecesInStock'], (n) => n + 1),
     // Remove piece at given position
     applyTo('pieces', _.remove(isAtPosition))
   )(state)

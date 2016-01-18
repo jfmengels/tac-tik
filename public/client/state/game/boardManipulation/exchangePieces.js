@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { ifNoError } from '../utils'
+import { ifNoError, applyTo } from '../utils'
 
 const setErrorIfOnePieceWasNotFound = _.curry((playerId, index1, index2, state) => {
   const error = `Could not find one of the pieces`
@@ -42,10 +42,8 @@ export default _.curry((playerId, pos1, pos2, state) => {
       setErrorIfBlockingPieceFromOtherPlayer(playerId, index1, index2)
     ),
     ifNoError(_.flow(
-      _.set(false, `pieces[${index1}].isBlocking`),
-      _.set(false, `pieces[${index2}].isBlocking`),
-      _.set(pos2, `pieces[${index1}].pos`),
-      _.set(pos1, `pieces[${index2}].pos`)
+      applyTo(['pieces', index1], _.assign({isBlocking: false, pos: pos2})),
+      applyTo(['pieces', index2], _.assign({isBlocking: false, pos: pos1}))
     ))
   )(state)
 })
