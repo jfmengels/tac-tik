@@ -25,9 +25,25 @@ export const applyTo = _.curry((selector, fn, obj) => {
 })
 
 /**
- * Apply function to state if state.error is falsy, returns state untouched otherwise
- * @param  {fn} Function to apply
- * @return {state} state, updated or not
+ * Same as Lodash's _.flow, but stops applying fns as soon as state.error is truthy
+ * @param  {function[]} ...fns Functions to apply
+ * @return {function} function that takes a state and applies fns to it
  */
-export const ifNoError = (fn) =>
-  (state) => state.error ? state : fn(state)
+export const flowSkipOnError = (...fns) => (state) => {
+  return _.reduce(
+    (currState, fn) => currState.error ? currState : fn(currState),
+    state,
+    fns
+  )
+}
+
+/**
+ * Assign the error field with `error` if fn(state) returns truthy.
+ * @param  {Function} fn    Function returning a truthy/falsy value
+ * @param  {string}   error Error to assign
+ * @param  {object}   state State to optionally update
+ * @return {object}         State, updated or left untouched
+ */
+export const setErrorIf = _.curry((fn, error, state) => {
+  return fn(state) ? _.assign({error}, state) : state
+})
