@@ -10,7 +10,7 @@ describe('game - playing a card', () => {
       pieces: [{
         pos: 2,
         player: 0,
-        isBlocking: true,
+        isBlocking: false,
         isAtDestination: false
       }, {
         pos: 16,
@@ -32,7 +32,7 @@ describe('game - playing a card', () => {
           piecesInStock: 3,
           cards: [
             {value: 1, action: 'START', color: 'red'},
-            {value: 1, action: 'START', color: 'green'},
+            {value: 'PERMUTE', action: 'PERMUTE', color: 'red'},
             {value: 1, action: 'START', color: 'red'},
             {value: 6, action: 'MOVE', color: 'blue'}
           ]
@@ -107,6 +107,27 @@ describe('game - playing a card', () => {
     expect(state.pieces[0]).toEqual({
       pos: 10,
       player: 0,
+      isBlocking: false,
+      isAtDestination: false
+    })
+  })
+
+  it(`should move a piece on the board from a played 'permute' card`, () => {
+    const card = startState.players[1].cards[1] // PERMUTE card
+    const cardOptions = { pos: [2, 16] }
+
+    const state = playCard({playerId: 1, card, cardOptions}, startState)
+
+    expect(state.error).toEqual(null)
+    expect(state.pieces[0]).toEqual({
+      pos: 16,
+      player: 0,
+      isBlocking: false,
+      isAtDestination: false
+    })
+    expect(state.pieces[1]).toEqual({
+      pos: 2,
+      player: 1,
       isBlocking: false,
       isAtDestination: false
     })

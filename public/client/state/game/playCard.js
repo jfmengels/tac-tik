@@ -1,7 +1,7 @@
 import _ from 'lodash/fp'
 
 import { ifNoError, applyTo } from './utils'
-import { putPieceOnBoard, movePiece } from './boardManipulation'
+import { putPieceOnBoard, movePiece, exchangePieces } from './boardManipulation'
 
 export default ({playerId, card, cardOptions}, state) => {
   const foundCard = _.find(card, state.players[playerId].cards)
@@ -18,6 +18,8 @@ export default ({playerId, card, cardOptions}, state) => {
     operation = putPieceOnBoard(playerId)
   } else if (card.action === 'MOVE' || card.action === 'START') {
     operation = movePiece(cardOptions.piece, card.value)
+  } else if (card.action === 'PERMUTE') {
+    operation = exchangePieces(playerId, cardOptions.pos[0], cardOptions.pos[1])
   }
 
   return _.flow(
