@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { isAtPos, applyTo, setErrorIf, flowSkipOnError } from '../utils'
+import { isAtPos, update, setErrorIf, flowSkipOnError } from '../utils'
 import removePiece from './removePiece'
 
 const inBetween = (startPos, endPos) => ({pos}) => {
@@ -24,10 +24,10 @@ const findPiece = (pos, state) =>
     _.find((p) => p.pos === pos)
   )(state)
 
-const pieceIsNotOwn = (player, piece) => () =>
-  piece.player !== player
+const pieceIsNotOwn = (player, piece) =>
+  piece && piece.player !== player
 
-const doesNotExist = (piece) => () =>
+const doesNotExist = (piece) =>
   !piece
 
 export default _.curry((player, pos, steps, state) => {
@@ -44,7 +44,7 @@ export default _.curry((player, pos, steps, state) => {
     setErrorIf(pieceIsNotOwn(player, piece), pieceNotOwnError),
     setErrorIf(isBlocked(pos, newPos), blockedError),
     removePiece(newPos),
-    applyTo('pieces', _.map(
+    update('pieces', _.map(
       (p) => {
         if (!atPos(p)) { return p }
         return _.assign({pos: newPos, isBlocking: false}, p)

@@ -1,11 +1,10 @@
 import _ from 'lodash/fp'
 
-import { applyTo, flowSkipOnError, setErrorIf } from './utils'
-import { putPieceOnBoard, movePiece, exchangePieces, multiMove } from './boardManipulation'
+import { update, flowSkipOnError, setErrorIf } from './utils'
+import { putPieceOnBoard, movePiece, exchangePieces, multiMove } from './board'
 
-const totalNumberOfStepsDoesNotEqualCardValue = (cardValue, moves) => () => {
-  return _.sumBy(_.get('steps'), moves) !== cardValue
-}
+const totalNumberOfStepsDoesNotEqualCardValue = (cardValue, moves) =>
+  _.sumBy(_.get('steps'), moves) !== cardValue
 
 const findCardOperation = (playerId, card, cardOptions) => {
   if (card.action === 'START' && cardOptions.newPiece === true) {
@@ -36,6 +35,6 @@ export default ({playerId, card, cardOptions}, state) => {
 
   return flowSkipOnError(
     findCardOperation(playerId, card, cardOptions),
-    applyTo(['players', playerId, 'cards'], _.remove(card))
+    update(['players', playerId, 'cards'], _.remove(card))
   )(state)
 }

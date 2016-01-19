@@ -1,7 +1,7 @@
 import _ from 'lodash/fp'
 import expect from 'expect'
 
-import { applyTo } from './utils'
+import { update } from './utils'
 import distributeCards from './distributeCards'
 
 const unique = _.flow(_.flatten, _.uniq)
@@ -139,7 +139,7 @@ describe('game - distributing cards', () => {
   })
 
   it('should deplete cardsInDeck at every call', () => {
-    const removeCardsFromPlayersHand = applyTo('players', _.map(
+    const removeCardsFromPlayersHand = update('players', _.map(
       _.assign({cards: []})
     ))
 

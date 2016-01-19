@@ -1,8 +1,8 @@
 import _ from 'lodash/fp'
 
-import { applyTo, flowSkipOnError, setErrorIf } from '../utils'
+import { update, flowSkipOnError, setErrorIf } from '../utils'
 
-const onePieceWasNotFound = (playerId, index1, index2) => () =>
+const onePieceWasNotFound = (playerId, index1, index2) =>
   index1 === -1 || index2 === -1
 
 const isFromDifferentPlayer = _.curry((playerId, state, index) =>
@@ -35,7 +35,7 @@ export default _.curry((playerId, pos1, pos2, state) => {
     setErrorIf(onePieceWasNotFound(playerId, index1, index2), onePieceWasNotFoundError),
     setErrorIf(noneOfThePiecesAreYourOwn(playerId, index1, index2), noneOfThePiecesAreYourOwnError),
     setErrorIf(pieceFromOtherPlayerIsBlocking(playerId, index1, index2), pieceFromOtherPlayerIsBlockingError),
-    applyTo(['pieces', index1], _.assign({isBlocking: false, pos: pos2})),
-    applyTo(['pieces', index2], _.assign({isBlocking: false, pos: pos1}))
+    update(['pieces', index1], _.assign({isBlocking: false, pos: pos2})),
+    update(['pieces', index2], _.assign({isBlocking: false, pos: pos1}))
   )(state)
 })

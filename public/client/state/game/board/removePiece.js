@@ -1,8 +1,8 @@
 import _ from 'lodash/fp'
 
-import { isAtPos, applyTo, setErrorIf, flowSkipOnError } from '../utils'
+import { isAtPos, update, setErrorIf, flowSkipOnError } from '../utils'
 
-const pieceIsBlocking = (piece) => () =>
+const pieceIsBlocking = (piece) =>
   piece.isBlocking
 
 /**
@@ -26,8 +26,8 @@ export default _.curry((position, state) => {
   return flowSkipOnError(
     setErrorIf(pieceIsBlocking(piecesAtGivenPosition[0]), pieceIsBlockingError),
     // Put a piece back in the owner's stock
-    applyTo(['players', piecesAtGivenPosition[0].player, 'piecesInStock'], (n) => n + 1),
+    update(['players', piecesAtGivenPosition[0].player, 'piecesInStock'], (n) => n + 1),
     // Remove piece at given position
-    applyTo('pieces', _.remove(isAtPosition))
+    update('pieces', _.remove(isAtPosition))
   )(state)
 })

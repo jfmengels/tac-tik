@@ -14,12 +14,12 @@ export const isAtPos = _.curry((position, {pos, isAtDestination}) =>
 /**
  * Applies a function to the data targetted by selector inside obj (using lodash's _.get),
  * and updates obj with the new value at the same location.
- * Example: applyTo('a.b', (n) => n + 1, { a: { b: 2 } }) --> { a: { b: 3 } }
+ * Example: update('a.b', (n) => n + 1, { a: { b: 2 } }) --> { a: { b: 3 } }
  * @param  {string} selector Data selector used by lodash's _.set and _.get
  * @return {function} fn     Function to apply to the value
  * @return {object} obj      Object to apply changes to.
  */
-export const applyTo = _.curry((selector, fn, obj) => {
+export const update = _.curry((selector, fn, obj) => {
   const value = fn(_.get(selector, obj))
   return _.set(value, selector, obj)
 })
@@ -38,12 +38,25 @@ export const flowSkipOnError = (...fns) => (state) => {
 }
 
 /**
- * Assign the error field with `error` if fn(state) returns truthy.
- * @param  {Function} fn    Function returning a truthy/falsy value
- * @param  {string}   error Error to assign
- * @param  {object}   state State to optionally update
- * @return {object}         State, updated or left untouched
+ * Returns a function, that when given an value val, gets applied either `fnTrue` or `fnFalse`,
+ * based on the result of `cond(val)` if it is a function, or its truthyness otherwise.
+ * @param  {function|Any} cond Function that determines whether to call fnTrue or fnFalse.
+ *                             If not a function, then which function is called is based on
+ *                             the truthyness of its value
+ * @param  {function} fnTrue   Function to apply if condition is truthy
+ * @param  {function} fnFalse  (default=_.identity) Function to apply if condition is falsy
+ * @return {function}
  */
-export const setErrorIf = _.curry((fn, error, state) => {
-  return fn(state) ? _.assign({error}, state) : state
-})
+export const applyIf = (cond, fnTrue, fnFalse=_.identity) => (val) => {
+  const condition = _.isFunction(cond) ? cond(val) : cond
+  return condition ? fnTrue(val) : fnFalse(val)
+}
+
+/**
+ * Returns a function that when passed an value val, sets the error field to `error`
+ * if cond(state), or cond if cond is not a function, is truthy.
+ * @param  {Function} cond    Function returning a truthy/falsy value, or any value
+ * @param  {string}   error   Error to assign
+ * @return {function} function that takes an object and may assign an error field to it
+ */
+export const setErrorIf = (cond, error) => applyIf(cond, _.assign({error}))

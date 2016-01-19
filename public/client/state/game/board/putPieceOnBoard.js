@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { applyTo, flowSkipOnError } from '../utils'
+import { update, flowSkipOnError } from '../utils'
 import removePiece from './removePiece'
 
 const newPiece = (player, pos) => ({
@@ -16,8 +16,8 @@ export default _.curry((id, state) => {
   return flowSkipOnError(
     removePiece(newPos),
     // Add new piece to the board
-    applyTo('pieces', (p) => p.concat(newPiece(id, newPos))),
+    update('pieces', (p) => p.concat(newPiece(id, newPos))),
     // Decrement the player's stock
-    applyTo(['players', id, 'piecesInStock'], (n) => n - 1)
+    update(['players', id, 'piecesInStock'], (n) => n - 1)
   )(state)
 })

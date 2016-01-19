@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { applyTo } from './utils'
+import { update } from './utils'
 
 export default _.curry((cards, state) => {
   const {numberOfPlayers} = state.parameters
@@ -18,7 +18,7 @@ export default _.curry((cards, state) => {
     // Remove last nCards from deck
     _.assign({cardsInDeck}),
     // players[i] = cardsForEachPlayer[i]
-    applyTo('players', _.flow(
+    update('players', _.flow(
       _.zip(cardsForEachPlayer),
       _.map(([newCards, player]) => _.assign({cards: newCards}, player))
     ))
