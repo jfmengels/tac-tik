@@ -37,7 +37,7 @@ export default _.curry((player, pos, steps, state) => {
 
   const blockedError = `Can't remove a blocking piece from the board`
   const noPieceAtGivenPositionError = `There is no piece at the given position`
-  const pieceNotOwnError = `There is no piece at the given position`
+  const pieceNotOwnError = `Can't move a piece from another player`
 
   return flowSkipOnError(
     setErrorIf(doesNotExist(piece), noPieceAtGivenPositionError),

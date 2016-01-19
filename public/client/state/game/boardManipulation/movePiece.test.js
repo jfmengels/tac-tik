@@ -105,7 +105,7 @@ describe('game - moving a piece', () => {
   it('should set an error when moving a piece from another player', () => {
     const state = movePiece(3, 16, 16, startState)
 
-    expect(state.error).toEqual(`There is no piece at the given position`)
+    expect(state.error).toEqual(`Can't move a piece from another player`)
     expect(state.pieces).toEqual(startState.pieces)
     expect(state.players).toEqual(startState.players)
   })

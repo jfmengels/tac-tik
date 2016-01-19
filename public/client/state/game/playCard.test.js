@@ -17,6 +17,11 @@ describe('game - playing a card', () => {
         player: 1,
         isBlocking: true,
         isAtDestination: false
+      }, {
+        pos: 34,
+        player: 1,
+        isBlocking: false,
+        isAtDestination: false
       }],
       players: [
         {
@@ -29,11 +34,11 @@ describe('game - playing a card', () => {
           ]
         },
         {
-          piecesInStock: 3,
+          piecesInStock: 2,
           cards: [
             {value: 1, action: 'START', color: 'red'},
             {value: 'PERMUTE', action: 'PERMUTE', color: 'red'},
-            {value: 1, action: 'START', color: 'red'},
+            {value: 7, action: 'MULTI', color: 'red'},
             {value: 6, action: 'MOVE', color: 'blue'}
           ]
         },
@@ -62,7 +67,7 @@ describe('game - playing a card', () => {
     ])
   })
 
-  it(`should put a piece on the board from a played 'start' card`, () => {
+  it(`should put a piece on the board with a 'start' card`, () => {
     const previousCards = startState.players[0].cards
     const card = previousCards[1]
     const cardOptions = { newPiece: true }
@@ -71,8 +76,8 @@ describe('game - playing a card', () => {
 
     expect(state.error).toEqual(null)
     expect(state.players[0].piecesInStock).toEqual(2)
-    expect(state.pieces.length).toEqual(3)
-    expect(state.pieces[2]).toEqual({
+    expect(state.pieces.length).toEqual(4)
+    expect(state.pieces[3]).toEqual({
       pos: 0,
       player: 0,
       isBlocking: true,
@@ -80,7 +85,7 @@ describe('game - playing a card', () => {
     })
   })
 
-  it(`should move a piece on the board from a played 'move' card`, () => {
+  it(`should move a piece on the board with a 'move' card`, () => {
     const card = startState.players[0].cards[0] // 10/start card
     const cardOptions = { newPiece: false, piece: 2 }
 
@@ -88,7 +93,7 @@ describe('game - playing a card', () => {
 
     expect(state.error).toEqual(null)
     expect(state.players[0].piecesInStock).toEqual(3)
-    expect(state.pieces.length).toEqual(2)
+    expect(state.pieces.length).toEqual(3)
     expect(state.pieces[0]).toEqual({
       pos: 12,
       player: 0,
@@ -97,7 +102,7 @@ describe('game - playing a card', () => {
     })
   })
 
-  it(`should move a piece on the board from a played 'move' card`, () => {
+  it(`should move a piece on the board with a 'move' card`, () => {
     const card = startState.players[0].cards[3] // 8/move card
     const cardOptions = { piece: 2 }
 
@@ -112,7 +117,7 @@ describe('game - playing a card', () => {
     })
   })
 
-  it(`should move a piece on the board from a played 'permute' card`, () => {
+  it(`should exchange the positions of two pieces on the board with a 'permute' card`, () => {
     const card = startState.players[1].cards[1] // PERMUTE card
     const cardOptions = { pos: [2, 16] }
 
@@ -133,7 +138,65 @@ describe('game - playing a card', () => {
     })
   })
 
-  it(`should return state with an error and cancel card when playing invalid action`, () => {
+  it(`should move multiple pieces on the board with a 'multi' card`, () => {
+    const card = startState.players[1].cards[2] // 7/multi card
+    const cardOptions = {
+      moves: [
+        {pos: 16, steps: 4},
+        {pos: 34, steps: 3}
+      ]
+    }
+
+    const state = playCard({playerId: 1, card, cardOptions}, startState)
+
+    expect(state.error).toEqual(null)
+    expect(state.pieces[1]).toEqual({
+      pos: 20,
+      player: 1,
+      isBlocking: false,
+      isAtDestination: false
+    })
+    expect(state.pieces[2]).toEqual({
+      pos: 37,
+      player: 1,
+      isBlocking: false,
+      isAtDestination: false
+    })
+  })
+
+  it(`should set an error when total number of steps is higher than 'multi' card value`, () => {
+    const card = startState.players[1].cards[2] // 7/multi card
+    const cardOptions = {
+      moves: [
+        {pos: 16, steps: 4},
+        {pos: 34, steps: 4}
+      ]
+    }
+
+    const state = playCard({playerId: 1, card, cardOptions}, startState)
+
+    expect(state.error).toEqual(`Total number of steps does not equal the card value`)
+    expect(state.pieces).toEqual(startState.pieces)
+    expect(state.players).toEqual(startState.players)
+  })
+
+  it(`should set an error when total number of steps is lower than 'multi' card value`, () => {
+    const card = startState.players[1].cards[2] // 7/multi card
+    const cardOptions = {
+      moves: [
+        {pos: 16, steps: 2},
+        {pos: 34, steps: 3}
+      ]
+    }
+
+    const state = playCard({playerId: 1, card, cardOptions}, startState)
+
+    expect(state.error).toEqual(`Total number of steps does not equal the card value`)
+    expect(state.pieces).toEqual(startState.pieces)
+    expect(state.players).toEqual(startState.players)
+  })
+
+  it(`should set an error and cancel card when playing invalid action`, () => {
     const card = startState.players[1].cards[0] // 1/start card
     const cardOptions = { newPiece: true }
 
@@ -146,13 +209,25 @@ describe('game - playing a card', () => {
     expect(state.players).toEqual(startState.players)
   })
 
-  it(`should return state with an error and cancel card when playing a card not in the player's hand`, () => {
+  it(`should set an error and cancel card when playing a card not in the player's hand`, () => {
     const card = {value: 10, action: 'START', color: 'yellow'}
     const cardOptions = { newPiece: true }
 
     const state = playCard({playerId: 1, card, cardOptions}, startState)
 
     expect(state.error).toEqual(`Could not play card absent from player's hand`)
+    expect(state.pieces).toEqual(startState.pieces)
+    expect(state.players).toEqual(startState.players)
+  })
+
+  it(`should set an error when card action is unknown`, () => {
+    const card = startState.players[1].cards[0] // 1/start card
+    card.action = 'UNKNOWN ACTION'
+    const cardOptions = { newPiece: true }
+
+    const state = playCard({playerId: 1, card, cardOptions}, startState)
+
+    expect(state.error).toEqual('Unknown card action')
     expect(state.pieces).toEqual(startState.pieces)
     expect(state.players).toEqual(startState.players)
   })

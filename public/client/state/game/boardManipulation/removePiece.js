@@ -1,6 +1,9 @@
 import _ from 'lodash/fp'
 
-import { isAtPos, applyTo } from '../utils'
+import { isAtPos, applyTo, setErrorIf, flowSkipOnError } from '../utils'
+
+const pieceIsBlocking = (piece) => () =>
+  piece.isBlocking
 
 /**
  * Remove a piece from the board if one sits at the given position.
@@ -18,14 +21,12 @@ export default _.curry((position, state) => {
     return state
   }
 
-  const {player, isBlocking} = piecesAtGivenPosition[0]
-  if (isBlocking) {
-    return _.assign({error: `Can't remove a blocking piece from the board`}, state)
-  }
+  const pieceIsBlockingError = `Can't remove a blocking piece from the board`
 
-  return _.flow(
+  return flowSkipOnError(
+    setErrorIf(pieceIsBlocking(piecesAtGivenPosition[0]), pieceIsBlockingError),
     // Put a piece back in the owner's stock
-    applyTo(['players', player, 'piecesInStock'], (n) => n + 1),
+    applyTo(['players', piecesAtGivenPosition[0].player, 'piecesInStock'], (n) => n + 1),
     // Remove piece at given position
     applyTo('pieces', _.remove(isAtPosition))
   )(state)

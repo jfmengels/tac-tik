@@ -1,7 +1,31 @@
 import _ from 'lodash/fp'
 
-import { applyTo, flowSkipOnError } from './utils'
-import { putPieceOnBoard, movePiece, exchangePieces } from './boardManipulation'
+import { applyTo, flowSkipOnError, setErrorIf } from './utils'
+import { putPieceOnBoard, movePiece, exchangePieces, multiMove } from './boardManipulation'
+
+const totalNumberOfStepsDoesNotEqualCardValue = (cardValue, moves) => () => {
+  return _.sumBy(_.get('steps'), moves) !== cardValue
+}
+
+const findCardOperation = (playerId, card, cardOptions) => {
+  if (card.action === 'START' && cardOptions.newPiece === true) {
+    return putPieceOnBoard(playerId)
+  }
+  if (card.action === 'MOVE' || card.action === 'START') {
+    return movePiece(playerId, cardOptions.piece, card.value)
+  }
+  if (card.action === 'PERMUTE') {
+    return exchangePieces(playerId, cardOptions.pos[0], cardOptions.pos[1])
+  }
+  if (card.action === 'MULTI') {
+    const notEqualError = `Total number of steps does not equal the card value`
+    return flowSkipOnError(
+      setErrorIf(totalNumberOfStepsDoesNotEqualCardValue(card.value, cardOptions.moves), notEqualError),
+      multiMove(playerId, cardOptions.moves)
+    )
+  }
+  return _.assign({error: 'Unknown card action'})
+}
 
 export default ({playerId, card, cardOptions}, state) => {
   const foundCard = _.find(card, state.players[playerId].cards)
@@ -9,21 +33,9 @@ export default ({playerId, card, cardOptions}, state) => {
     return _.assign({error: `Could not play card absent from player's hand`}, state)
   }
 
-  const selector = ['players', playerId, 'cards']
-  // _.isEqual is not data-last. Should be fixed in the next release of lodash
-  const update = applyTo(selector, _.remove(_.partial(_.isEqual, _, card)))
-
-  let operation
-  if (card.action === 'START' && cardOptions.newPiece === true) {
-    operation = putPieceOnBoard(playerId)
-  } else if (card.action === 'MOVE' || card.action === 'START') {
-    operation = movePiece(playerId, cardOptions.piece, card.value)
-  } else if (card.action === 'PERMUTE') {
-    operation = exchangePieces(playerId, cardOptions.pos[0], cardOptions.pos[1])
-  }
 
   return flowSkipOnError(
-    operation,
-    update
+    findCardOperation(playerId, card, cardOptions),
+    applyTo(['players', playerId, 'cards'], _.remove(card))
   )(state)
 }
