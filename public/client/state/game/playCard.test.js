@@ -1,12 +1,12 @@
+import _ from 'lodash/fp'
 import expect from 'expect'
+import freeze from 'deep-freeze-node'
 
 import playCard from './playCard'
 
 describe('game - playing a card', () => {
-  let startState
-
-  beforeEach(() => {
-    startState = {
+  const setup = () => {
+    return freeze({
       pieces: [{
         pos: 2,
         player: 0,
@@ -50,10 +50,11 @@ describe('game - playing a card', () => {
         numberOfPlayers: 4
       },
       error: null
-    }
-  })
+    })
+  }
 
   it(`should remove the played card from the player's hand`, () => {
+    const startState = setup()
     const previousCards = startState.players[0].cards
     const card = previousCards[1]
     const cardOptions = { newPiece: true }
@@ -68,6 +69,7 @@ describe('game - playing a card', () => {
   })
 
   it(`should put a piece on the board with a 'start' card`, () => {
+    const startState = setup()
     const previousCards = startState.players[0].cards
     const card = previousCards[1]
     const cardOptions = { newPiece: true }
@@ -86,6 +88,7 @@ describe('game - playing a card', () => {
   })
 
   it(`should move a piece on the board with a 'move' card`, () => {
+    const startState = setup()
     const card = startState.players[0].cards[0] // 10/start card
     const cardOptions = { newPiece: false, piece: 2 }
 
@@ -103,6 +106,7 @@ describe('game - playing a card', () => {
   })
 
   it(`should move a piece on the board with a 'move' card`, () => {
+    const startState = setup()
     const card = startState.players[0].cards[3] // 8/move card
     const cardOptions = { piece: 2 }
 
@@ -118,6 +122,7 @@ describe('game - playing a card', () => {
   })
 
   it(`should exchange the positions of two pieces on the board with a 'permute' card`, () => {
+    const startState = setup()
     const card = startState.players[1].cards[1] // PERMUTE card
     const cardOptions = { pos: [2, 16] }
 
@@ -139,6 +144,7 @@ describe('game - playing a card', () => {
   })
 
   it(`should move multiple pieces on the board with a 'multi' card`, () => {
+    const startState = setup()
     const card = startState.players[1].cards[2] // 7/multi card
     const cardOptions = {
       moves: [
@@ -165,6 +171,7 @@ describe('game - playing a card', () => {
   })
 
   it(`should set an error when total number of steps is higher than 'multi' card value`, () => {
+    const startState = setup()
     const card = startState.players[1].cards[2] // 7/multi card
     const cardOptions = {
       moves: [
@@ -181,6 +188,7 @@ describe('game - playing a card', () => {
   })
 
   it(`should set an error when total number of steps is lower than 'multi' card value`, () => {
+    const startState = setup()
     const card = startState.players[1].cards[2] // 7/multi card
     const cardOptions = {
       moves: [
@@ -197,6 +205,7 @@ describe('game - playing a card', () => {
   })
 
   it(`should set an error and cancel card when playing invalid action`, () => {
+    const startState = setup()
     const card = startState.players[1].cards[0] // 1/start card
     const cardOptions = { newPiece: true }
 
@@ -210,6 +219,7 @@ describe('game - playing a card', () => {
   })
 
   it(`should set an error and cancel card when playing a card not in the player's hand`, () => {
+    const startState = setup()
     const card = {value: 10, action: 'START', color: 'yellow'}
     const cardOptions = { newPiece: true }
 
@@ -221,8 +231,11 @@ describe('game - playing a card', () => {
   })
 
   it(`should set an error when card action is unknown`, () => {
+    const startState = _.flow(
+      _.set('UNKNOWN ACTION', ['players', 1, 'cards', 0, 'action']),
+      freeze
+    )(setup())
     const card = startState.players[1].cards[0] // 1/start card
-    card.action = 'UNKNOWN ACTION'
     const cardOptions = { newPiece: true }
 
     const state = playCard({playerId: 1, card, cardOptions}, startState)

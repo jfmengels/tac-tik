@@ -1,12 +1,11 @@
 import expect from 'expect'
+import freeze from 'deep-freeze-node'
 
 import multiMove from './multiMove'
 
 describe('game - moving multiple pieces', () => {
-  let startState
-
-  beforeEach(() => {
-    startState = {
+  const setup = () => {
+    return freeze({
       pieces: [{
         pos: 32,
         player: 2,
@@ -43,10 +42,11 @@ describe('game - moving multiple pieces', () => {
         numberOfPlayers: 4
       },
       error: null
-    }
-  })
+    })
+  }
 
   it('should be able to move a piece forward and set it as non-blocking', () => {
+    const startState = setup()
     const moves = [
       {pos: 32, steps: 7}
     ]
@@ -59,6 +59,7 @@ describe('game - moving multiple pieces', () => {
   })
 
   it('should be able to move several pieces', () => {
+    const startState = setup()
     const moves = [
       {pos: 7, steps: 4},
       {pos: 16, steps: 3}
@@ -74,6 +75,7 @@ describe('game - moving multiple pieces', () => {
   })
 
   it('should remove all pieces on the path and at destination', () => {
+    const startState = setup()
     const moves = [
       {pos: 7, steps: 4},
       {pos: 16, steps: 3}
@@ -87,6 +89,7 @@ describe('game - moving multiple pieces', () => {
   })
 
   it('should be done in given order (piece gets removed)', () => {
+    const startState = setup()
     const moves = [
       {pos: 8, steps: 3},
       {pos: 11, steps: 4}
@@ -101,6 +104,7 @@ describe('game - moving multiple pieces', () => {
   })
 
   it('should be done in given order (piece does not get removed)', () => {
+    const startState = setup()
     const moves = [
       {pos: 11, steps: 4},
       {pos: 8, steps: 3}
@@ -116,6 +120,7 @@ describe('game - moving multiple pieces', () => {
   })
 
   it('should set an error if attempting to move a piece from another player', () => {
+    const startState = setup()
     const moves = [
       {pos: 32, steps: 7}
     ]
@@ -128,6 +133,7 @@ describe('game - moving multiple pieces', () => {
   })
 
   it('should revert any changes before setting an error when attempting to move a piece from another player', () => {
+    const startState = setup()
     const moves = [
       {pos: 32, steps: 4},
       {pos: 8, steps: 3}
@@ -141,6 +147,7 @@ describe('game - moving multiple pieces', () => {
   })
 
   it('should set an error if one of the moves is invalid due to a blocking piece', () => {
+    const startState = setup()
     const moves = [
       {pos: 8, steps: 2},
       {pos: 11, steps: 5}

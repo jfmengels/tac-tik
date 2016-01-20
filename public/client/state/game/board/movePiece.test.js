@@ -1,12 +1,12 @@
+import _ from 'lodash/fp'
 import expect from 'expect'
+import freeze from 'deep-freeze-node'
 
 import movePiece from './movePiece'
 
 describe('game - moving a piece', () => {
-  let startState
-
-  beforeEach(() => {
-    startState = {
+  const setup = () => {
+    return freeze({
       pieces: [{
         pos: 32,
         player: 2,
@@ -35,10 +35,12 @@ describe('game - moving a piece', () => {
         numberOfPlayers: 4
       },
       error: null
-    }
-  })
+    })
+  }
 
   it('should be able to move a piece forward and set it as non-blocking', () => {
+    const startState = setup()
+
     const state = movePiece(2, 32, 5, startState)
 
     expect(state.error).toEqual(null)
@@ -47,8 +49,11 @@ describe('game - moving a piece', () => {
   })
 
   it('should not re-set non-blocking piece to blocking', () => {
-    startState.pieces[0].pos = 37
-    startState.pieces[0].blocking = false
+    const startState = _.flow(
+      _.set(37, ['pieces', 0, 'pos']),
+      _.set(false, ['pieces', 0, 'blocking']),
+      freeze
+    )(setup())
 
     const state = movePiece(2, 37, 8, startState)
 
@@ -57,12 +62,16 @@ describe('game - moving a piece', () => {
   })
 
   it('should be able to loop over the board', () => {
+    const startState = setup()
+
     const state = movePiece(2, 32, 41, startState)
 
     expect(state.pieces[0].pos).toEqual(9)
   })
 
   it('should not remove non-blocking pieces that are walked passed over', () => {
+    const startState = setup()
+
     const state = movePiece(0, 3, 9, startState)
 
     expect(state.pieces[1].pos).toEqual(12)
@@ -70,6 +79,8 @@ describe('game - moving a piece', () => {
   })
 
   it('should remove a non-blocking piece that is at the destination', () => {
+    const startState = setup()
+
     const state = movePiece(0, 3, 5, startState)
 
     expect(state.pieces.length).toEqual(startState.pieces.length - 1)
@@ -79,6 +90,8 @@ describe('game - moving a piece', () => {
   })
 
   it('should set an error if a blocking piece is at the destination', () => {
+    const startState = setup()
+
     const state = movePiece(0, 3, 13, startState)
 
     expect(state.error).toEqual(`Can't remove a blocking piece from the board`)
@@ -87,6 +100,8 @@ describe('game - moving a piece', () => {
   })
 
   it('should set an error if a blocking piece is on the path (not looping the board)', () => {
+    const startState = setup()
+
     const state = movePiece(0, 3, 16, startState)
 
     expect(state.error).toEqual(`Can't remove a blocking piece from the board`)
@@ -95,6 +110,8 @@ describe('game - moving a piece', () => {
   })
 
   it('should set an error if a blocking piece is at destination (looping the board)', () => {
+    const startState = setup()
+
     const state = movePiece(1, 16, 16, startState)
 
     expect(state.error).toEqual(`Can't remove a blocking piece from the board`)
@@ -103,6 +120,8 @@ describe('game - moving a piece', () => {
   })
 
   it('should set an error when moving a piece from another player', () => {
+    const startState = setup()
+
     const state = movePiece(3, 16, 16, startState)
 
     expect(state.error).toEqual(`Can't move a piece from another player`)
@@ -111,6 +130,8 @@ describe('game - moving a piece', () => {
   })
 
   it('should set an error when moving a piece from a position where there is none', () => {
+    const startState = setup()
+
     const state = movePiece(0, 1, 2, startState)
 
     expect(state.error).toEqual(`There is no piece at the given position`)

@@ -1,12 +1,11 @@
 import expect from 'expect'
+import freeze from 'deep-freeze-node'
 
 import exchangePieces from './exchangePieces'
 
 describe('game - exchanging pieces', () => {
-  let startState
-
-  beforeEach(() => {
-    startState = {
+  const setup = () => {
+    return freeze({
       pieces: [{
         pos: 0,
         player: 0,
@@ -31,10 +30,12 @@ describe('game - exchanging pieces', () => {
         numberOfPlayers: 4
       },
       error: null
-    }
-  })
+    })
+  }
 
   it('should exchange the position of two pieces', () => {
+    const startState = setup()
+
     const state = exchangePieces(0, 10, 48, startState)
 
     expect(state.pieces.length).toEqual(startState.pieces.length)
@@ -45,6 +46,8 @@ describe('game - exchanging pieces', () => {
   })
 
   it(`should set player's own piece (first) as non-blocking`, () => {
+    const startState = setup()
+
     const state = exchangePieces(0, 0, 48, startState)
 
     expect(state.pieces.length).toEqual(startState.pieces.length)
@@ -56,6 +59,8 @@ describe('game - exchanging pieces', () => {
   })
 
   it(`should set player's own piece (second) as non-blocking`, () => {
+    const startState = setup()
+
     const state = exchangePieces(0, 48, 0, startState)
 
     expect(state.pieces.length).toEqual(startState.pieces.length)
@@ -67,6 +72,8 @@ describe('game - exchanging pieces', () => {
   })
 
   it('should set second piece as non-blocking if it is from the same player as the first one', () => {
+    const startState = setup()
+
     const state = exchangePieces(0, 10, 0, startState)
 
     expect(state.pieces.length).toEqual(startState.pieces.length)
@@ -78,6 +85,8 @@ describe('game - exchanging pieces', () => {
   })
 
   it('should set an error when second piece is blocking and from a different player', () => {
+    const startState = setup()
+
     const stateCase1 = exchangePieces(1, 48, 0, startState)
     const stateCase2 = exchangePieces(1, 0, 48, startState)
 
@@ -88,6 +97,8 @@ describe('game - exchanging pieces', () => {
   })
 
   it('should set an error when none of the pieces are from the current player', () => {
+    const startState = setup()
+
     const state = exchangePieces(1, 0, 10, startState)
 
     expect(state.error).toEqual(`Can't exchange two pieces that are not your own`)
@@ -95,6 +106,8 @@ describe('game - exchanging pieces', () => {
   })
 
   it('should set an error if one of the pieces is not found', () => {
+    const startState = setup()
+
     const stateCase1 = exchangePieces(0, 0, 25, startState)
     const stateCase2 = exchangePieces(0, 25, 0, startState)
 

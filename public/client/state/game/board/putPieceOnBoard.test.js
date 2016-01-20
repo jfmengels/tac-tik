@@ -1,12 +1,11 @@
 import expect from 'expect'
+import freeze from 'deep-freeze-node'
 
 import putPieceOnBoard from './putPieceOnBoard'
 
 describe('game - starting a piece', () => {
-  let startState
-
-  beforeEach(() => {
-    startState = {
+  const setup = () => {
+    return freeze({
       pieces: [{
         pos: 0,
         player: 0,
@@ -27,10 +26,12 @@ describe('game - starting a piece', () => {
         numberOfPlayers: 4
       },
       error: null
-    }
-  })
+    })
+  }
 
   it('should put a new piece on the board and remove one from the stock', () => {
+    const startState = setup()
+
     const state = putPieceOnBoard(2, startState)
 
     expect(state.players[2].piecesInStock).toEqual(3)
@@ -44,6 +45,8 @@ describe('game - starting a piece', () => {
   })
 
   it('should remove a piece if one is present at the starting position', () => {
+    const startState = setup()
+
     const state = putPieceOnBoard(3, startState)
 
     expect(state.players[3].piecesInStock).toEqual(3)
@@ -58,6 +61,8 @@ describe('game - starting a piece', () => {
   })
 
   it('should set an error if a blocking piece is already present', () => {
+    const startState = setup()
+
     const state = putPieceOnBoard(0, startState)
 
     expect(state.error).toEqual(`Can't remove a blocking piece from the board`)
