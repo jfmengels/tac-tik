@@ -5,53 +5,51 @@ import freeze from 'deep-freeze-node'
 import playCard from './playCard'
 
 describe('game - playing a card', () => {
-  const setup = () => {
-    return freeze({
-      pieces: [{
-        pos: 2,
-        player: 0,
-        isBlocking: false,
-        isAtDestination: false
-      }, {
-        pos: 16,
-        player: 1,
-        isBlocking: true,
-        isAtDestination: false
-      }, {
-        pos: 34,
-        player: 1,
-        isBlocking: false,
-        isAtDestination: false
-      }],
-      players: [
-        {
-          piecesInStock: 3,
-          cards: [
-            {value: 10, action: 'START', color: 'blue'},
-            {value: 10, action: 'START', color: 'green'},
-            {value: 10, action: 'START', color: 'red'},
-            {value: 8, action: 'MOVE', color: 'blue'}
-          ]
-        },
-        {
-          piecesInStock: 2,
-          cards: [
-            {value: 1, action: 'START', color: 'red'},
-            {value: 'PERMUTE', action: 'PERMUTE', color: 'red'},
-            {value: 7, action: 'MULTI', color: 'red'},
-            {value: 6, action: 'MOVE', color: 'blue'}
-          ]
-        },
-        {piecesInStock: 4, cards: []},
-        {piecesInStock: 4, cards: []}
-      ],
-      parameters: {
-        distanceBetweenPlayers: 16,
-        numberOfPlayers: 4
+  const setup = () => freeze({
+    pieces: [{
+      pos: 2,
+      player: 0,
+      isBlocking: false,
+      isAtDestination: false
+    }, {
+      pos: 16,
+      player: 1,
+      isBlocking: true,
+      isAtDestination: false
+    }, {
+      pos: 34,
+      player: 1,
+      isBlocking: false,
+      isAtDestination: false
+    }],
+    players: [
+      {
+        piecesInStock: 3,
+        cards: [
+          {value: 10, action: 'START', color: 'blue'},
+          {value: 10, action: 'START', color: 'green'},
+          {value: 10, action: 'START', color: 'red'},
+          {value: 8, action: 'MOVE', color: 'blue'}
+        ]
       },
-      error: null
-    })
-  }
+      {
+        piecesInStock: 2,
+        cards: [
+          {value: 1, action: 'START', color: 'red'},
+          {value: 'PERMUTE', action: 'PERMUTE', color: 'red'},
+          {value: 7, action: 'MULTI', color: 'red'},
+          {value: 6, action: 'MOVE', color: 'blue'}
+        ]
+      },
+      {piecesInStock: 4, cards: []},
+      {piecesInStock: 4, cards: []}
+    ],
+    parameters: {
+      distanceBetweenPlayers: 16,
+      numberOfPlayers: 4
+    },
+    error: null
+  })
 
   it(`should remove the played card from the player's hand`, () => {
     const startState = setup()
