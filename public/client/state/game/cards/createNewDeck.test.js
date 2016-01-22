@@ -1,7 +1,7 @@
 import _ from 'lodash/fp'
 import expect from 'expect'
 
-import createNewDeck from './cards'
+import createNewDeck from './createNewDeck'
 
 describe('game - cards shuffling', () => {
   it('should return the whole deck', () => {

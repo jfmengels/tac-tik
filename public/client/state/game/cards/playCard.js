@@ -1,7 +1,7 @@
 import _ from 'lodash/fp'
 
-import { update, flowSkipOnError, setErrorIf } from './utils'
-import { putPieceOnBoard, movePiece, exchangePieces, multiMove } from './board'
+import { update, flowSkipOnError, setErrorIf } from '../utils'
+import { putPieceOnBoard, movePiece, exchangePieces, multiMove } from '../board'
 
 const totalNumberOfStepsDoesNotEqualCardValue = (cardValue, moves) =>
   _.sumBy(_.get('steps'), moves) !== cardValue

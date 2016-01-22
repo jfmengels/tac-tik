@@ -1,6 +1,4 @@
-import createNewDeck from './cards'
-import distributeCards from './distributeCards'
-import playCardReducer from './playCard'
+import { createNewDeck, distributeCards, playCard as playCardReducer } from './cards'
 import { createReducer } from '../utils'
 
 const prefix = 'game/'
