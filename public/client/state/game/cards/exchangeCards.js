@@ -19,6 +19,21 @@ const cardIsNotInPlayersHand = _.curry(({playerId, card}, state) =>
   state.players[playerId].cards.indexOf(card) === -1
 )
 
+/**
+ * Exchange a card from two partnered players' hands.
+ * Will abort and set an error if:
+ * - The two players are not partnered
+ * - Any of the given cards if not in that player's hand
+ * @param  {object} player1Data Data describing the card to exchange from player 1
+ * Is in the form:
+ * {
+ *   playerId: int, // Id of the player owning the card
+ *   card: card     // value of the card to exchange
+ * }
+ * @param  {object} player2Data Data describing the card to exchange from player 2.
+ * @param  {object} state State of the game
+ * @return {object} Updated state of the game
+ */
 export default _.curry((player1Data, player2Data, state) => {
   const playersAreNotPartnersError = `Can't exchange cards between two players who are not partners`
   const cardIsNotInPlayersHandError = `Could not find card in player's hand`

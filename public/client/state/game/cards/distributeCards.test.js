@@ -8,7 +8,6 @@ import distributeCards from './distributeCards'
 const unique = _.flow(_.flatten, _.uniq)
 
 describe('game - distributing cards', () => {
-
   const setup = () => {
     const cardsInDeck = freeze([
       { value: 1, action: 'START', color: 'blue' },

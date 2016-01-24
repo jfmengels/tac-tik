@@ -29,6 +29,20 @@ const pieceIsNotOwn = (player, piece) =>
 const doesNotExist = (piece) =>
   !piece
 
+/**
+ * Move a piece on the board by a given number of steps.
+ * Will abort and set an error if:
+ * - There is no piece at the given position
+ * - The moving piece is not from the given player
+ * - The move is blocked by a blocking piece on the board
+ * Will remove a non-blocking piece from the board if it is at the position the moved piece ends up.
+ * If the piece to move is in the blocking state, it will be made non-blocking.
+ * @param  {int} player   Id of the player who made the action
+ * @param  {int} pos      Position of the piece to move
+ * @param  {int} steps    Number of steps to move (can be a negative number) the piece.
+ * @param  {object} state State of the game
+ * @return {object} Updated state of the game
+ */
 export default _.curry((player, pos, steps, state) => {
   const atPos = isAtPos(pos)
   const newPos = (pos + steps) % (state.parameters.numberOfPlayers * state.parameters.distanceBetweenPlayers)

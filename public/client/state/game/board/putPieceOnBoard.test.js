@@ -1,3 +1,4 @@
+import _ from 'lodash/fp'
 import expect from 'expect'
 import freeze from 'deep-freeze-node'
 
@@ -68,5 +69,16 @@ describe('game - starting a piece', () => {
     expect(state.error).toEqual(`Can't remove a blocking piece from the board`)
     expect(state.pieces).toEqual(startState.pieces)
     expect(state.players).toEqual(startState.players)
+  })
+
+  it('should set an error if the player has no more pieces in stock', () => {
+    const startState = setup()
+    const tmpState = freeze(_.set(0, ['players', 3, 'piecesInStock'], startState))
+
+    const state = putPieceOnBoard(3, tmpState)
+
+    expect(state.error).toEqual(`Can't put a new piece on the board because none are left in stock`)
+    expect(state.pieces).toEqual(tmpState.pieces)
+    expect(state.players).toEqual(tmpState.players)
   })
 })

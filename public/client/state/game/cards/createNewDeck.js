@@ -15,4 +15,15 @@ const allCards = _.flatMap(
   colors
 )
 
+/**
+ * Return a new shuffled deck of cards.
+ * The deck will always contain the same set of cards, but the order of the cards
+ * will be different on consecutive calls.
+ * @return {card[]} Array of cards of the form
+ * {
+ *   value: <number> | "PERMUTE",
+ *   action: "MOVE" | "MULTI" | "START" | "PERMUTE",
+ *   color: "red" | "blue" | "green" | "yellow"
+ * }
+ */
 export default () => _.shuffle(allCards)

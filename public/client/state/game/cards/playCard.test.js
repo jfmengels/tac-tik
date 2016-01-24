@@ -88,7 +88,7 @@ describe('game - playing a card', () => {
   it(`should move a piece on the board with a 'move' card`, () => {
     const startState = setup()
     const card = startState.players[0].cards[0] // 10/start card
-    const cardOptions = { newPiece: false, piece: 2 }
+    const cardOptions = { newPiece: false, pos: 2 }
 
     const state = playCard({playerId: 0, card, cardOptions}, startState)
 
@@ -106,7 +106,7 @@ describe('game - playing a card', () => {
   it(`should move a piece on the board with a 'move' card`, () => {
     const startState = setup()
     const card = startState.players[0].cards[3] // 8/move card
-    const cardOptions = { piece: 2 }
+    const cardOptions = { pos: 2 }
 
     const state = playCard({playerId: 0, card, cardOptions}, startState)
 
