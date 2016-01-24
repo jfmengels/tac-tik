@@ -16,7 +16,7 @@ const newPlayer = (numberOfPlayers) => (id) => ({
 
 // const piecePosition = {
 //   player: <number>,
-//   isAtDestination: <boolean>,
+//   isHome: <boolean>,
 //   pos: <number
 //        ; 0-3 if at destination
 //        , 0-(numberOfPlayers * distanceBetweenPlayers) otherwise>,

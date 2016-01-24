@@ -9,15 +9,18 @@ describe('game - exchanging pieces', () => {
       pieces: [{
         pos: 0,
         player: 0,
-        isBlocking: true
+        isBlocking: true,
+        isHome: false
       }, {
         pos: 10,
         player: 0,
-        isBlocking: false
+        isBlocking: false,
+        isHome: false
       }, {
         pos: 48,
         player: 1,
-        isBlocking: false
+        isBlocking: false,
+        isHome: false
       }],
       players: [
         {piecesInStock: 2},

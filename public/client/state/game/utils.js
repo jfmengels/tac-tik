@@ -7,8 +7,8 @@ import _ from 'lodash/fp'
  * @param {object} piece Object containing the position of the piece and whether it's in the destination locations.
  * @return {boolean} true if piece is at the given position but not in the destination locations, false otherwise.
  */
-export const isAtPos = _.curry((position, {pos, isAtDestination}) =>
-  pos === position && !isAtDestination
+export const isAtPos = _.curry((position, {pos, isHome}) =>
+  pos === position && !isHome
 )
 
 /**

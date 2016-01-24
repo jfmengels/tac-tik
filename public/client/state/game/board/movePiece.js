@@ -10,13 +10,12 @@ const inBetween = (startPos, endPos) => ({pos}) => {
   return startPos < pos && pos <= endPos
 }
 
-const isBlocked = (startPos, endPos) => (state) =>
-  _.flow(
-    _.get('pieces'),
-    _.filter((p) => p.isBlocking),
-    _.filter(inBetween(startPos, endPos)),
-    (p) => p.length > 0
-  )(state)
+const isBlocked = (startPos, endPos) => _.flow(
+  _.get('pieces'),
+  _.filter((p) => p.isBlocking),
+  _.filter(inBetween(startPos, endPos)),
+  (p) => p.length > 0
+)
 
 const findPiece = (pos, state) =>
   _.flow(

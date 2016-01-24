@@ -10,17 +10,17 @@ describe('game - playing a card', () => {
       pos: 2,
       player: 0,
       isBlocking: false,
-      isAtDestination: false
+      isHome: false
     }, {
       pos: 16,
       player: 1,
       isBlocking: true,
-      isAtDestination: false
+      isHome: false
     }, {
       pos: 34,
       player: 1,
       isBlocking: false,
-      isAtDestination: false
+      isHome: false
     }],
     players: [
       {
@@ -81,7 +81,7 @@ describe('game - playing a card', () => {
       pos: 0,
       player: 0,
       isBlocking: true,
-      isAtDestination: false
+      isHome: false
     })
   })
 
@@ -99,7 +99,7 @@ describe('game - playing a card', () => {
       pos: 12,
       player: 0,
       isBlocking: false,
-      isAtDestination: false
+      isHome: false
     })
   })
 
@@ -115,7 +115,7 @@ describe('game - playing a card', () => {
       pos: 10,
       player: 0,
       isBlocking: false,
-      isAtDestination: false
+      isHome: false
     })
   })
 
@@ -131,13 +131,13 @@ describe('game - playing a card', () => {
       pos: 16,
       player: 0,
       isBlocking: false,
-      isAtDestination: false
+      isHome: false
     })
     expect(state.pieces[1]).toEqual({
       pos: 2,
       player: 1,
       isBlocking: false,
-      isAtDestination: false
+      isHome: false
     })
   })
 
@@ -158,13 +158,13 @@ describe('game - playing a card', () => {
       pos: 20,
       player: 1,
       isBlocking: false,
-      isAtDestination: false
+      isHome: false
     })
     expect(state.pieces[2]).toEqual({
       pos: 37,
       player: 1,
       isBlocking: false,
-      isAtDestination: false
+      isHome: false
     })
   })
 

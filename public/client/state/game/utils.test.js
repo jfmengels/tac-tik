@@ -5,7 +5,7 @@ import { isAtPos, update, flowSkipOnError, applyIf, setErrorIf } from './utils'
 
 describe('utils', () => {
   describe('isAtPos', () => {
-    const toPiece = (pos, isAtDestination) => ({pos, isAtDestination})
+    const toPiece = (pos, isHome) => ({pos, isHome})
 
     it('should return true if piece is at the given position and not at destination', () => {
       const position = 12

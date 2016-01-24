@@ -40,7 +40,7 @@ describe('game - starting a piece', () => {
       pos: 32,
       player: 2,
       isBlocking: true,
-      isAtDestination: false
+      isHome: false
     })
   })
 
@@ -56,7 +56,7 @@ describe('game - starting a piece', () => {
       pos: 48,
       player: 3,
       isBlocking: true,
-      isAtDestination: false
+      isHome: false
     })
   })
 

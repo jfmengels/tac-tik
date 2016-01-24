@@ -7,7 +7,7 @@ const newPiece = (player, pos) => ({
   player,
   pos,
   isBlocking: true,
-  isAtDestination: false
+  isHome: false
 })
 
 export default _.curry((id, state) => {
