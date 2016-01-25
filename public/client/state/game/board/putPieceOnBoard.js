@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { update, setErrorIf, flowSkipOnError } from '../utils'
+import { update, setErrorIf, flowSkipOnError } from '../fp-utils'
 import removePiece from './removePiece'
 
 const newPiece = (player, pos) => ({

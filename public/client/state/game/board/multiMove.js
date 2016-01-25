@@ -1,7 +1,7 @@
 import _ from 'lodash/fp'
 
 import movePiece from './movePiece'
-import { flowSkipOnError } from '../utils'
+import { flowSkipOnError } from '../fp-utils'
 
 // Map move to an array of 1-step `movePiece()`s
 const mapMoveToNTimes1MovePiece = (player) => ({pos, steps}) => {

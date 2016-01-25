@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { isAtPos, update, setErrorIf, flowSkipOnError } from '../utils'
+import { isAtPos, update, setErrorIf, flowSkipOnError } from '../fp-utils'
 
 const pieceIsBlocking = (piece) =>
   piece.isBlocking

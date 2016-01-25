@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { update, flowSkipOnError, setErrorIf } from '../utils'
+import { update, flowSkipOnError, setErrorIf } from '../fp-utils'
 
 const onePieceWasNotFound = (playerId, index1, index2) =>
   index1 === -1 || index2 === -1

@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { update } from '../utils'
+import { update } from '../fp-utils'
 
 /**
  * Distribute a new hand to each players.

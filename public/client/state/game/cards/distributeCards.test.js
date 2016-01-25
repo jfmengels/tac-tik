@@ -2,7 +2,7 @@ import _ from 'lodash/fp'
 import expect from 'expect'
 import freeze from 'deep-freeze-node'
 
-import { update } from '../utils'
+import { update } from '../fp-utils'
 import distributeCards from './distributeCards'
 
 const unique = _.flow(_.flatten, _.uniq)

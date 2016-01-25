@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { update, setErrorIf, flowSkipOnError } from '../utils'
+import { update, setErrorIf, flowSkipOnError } from '../fp-utils'
 
 const cardSelector = (player) =>
   ['players', player, 'cards']

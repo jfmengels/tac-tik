@@ -1,6 +1,6 @@
 import _ from 'lodash/fp'
 
-import { update, flowSkipOnError, setErrorIf } from '../utils'
+import { update, flowSkipOnError, setErrorIf } from '../fp-utils'
 import { putPieceOnBoard, movePiece, exchangePieces, multiMove } from '../board'
 
 const totalNumberOfStepsDoesNotEqualCardValue = (cardValue, moves) =>

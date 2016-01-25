@@ -1,9 +1,9 @@
 import _ from 'lodash/fp'
 import expect from 'expect'
 
-import { isAtPos, update, flowSkipOnError, applyIf, setErrorIf } from './utils'
+import { isAtPos, update, flowSkipOnError, applyIf, setErrorIf } from './fp-utils'
 
-describe('utils', () => {
+describe('fp-utils', () => {
   describe('isAtPos', () => {
     const toPiece = (pos, isHome) => ({pos, isHome})
 
