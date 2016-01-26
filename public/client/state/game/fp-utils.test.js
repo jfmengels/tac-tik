@@ -97,7 +97,7 @@ describe('fp-utils', () => {
       return {
         error,
         incrementVal: update('val', (n) => n + 1),
-        setError: _.assign({error}),
+        setError: _.set('error', error),
         obj: {
           val: 0,
           error: null
@@ -136,8 +136,8 @@ describe('fp-utils', () => {
   describe('applyIf', () => {
     const setup = () => {
       return {
-        okToTrue: _.assign({ok: true}),
-        okToFalse: _.assign({ok: false}),
+        okToTrue: _.set('ok', true),
+        okToFalse: _.set('ok', false),
         obj: {
           a: 10
         }

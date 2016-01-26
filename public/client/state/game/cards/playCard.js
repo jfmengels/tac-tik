@@ -23,7 +23,7 @@ const findCardOperation = (playerId, card, cardOptions) => {
       multiMove(playerId, cardOptions.moves)
     )
   }
-  return _.assign({error: 'Unknown card action'})
+  return _.set('error', 'Unknown card action')
 }
 
 const cardIsNotInPlayerHand = (playerId, card) => _.flow(

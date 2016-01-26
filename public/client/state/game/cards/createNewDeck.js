@@ -11,7 +11,7 @@ const colors = ['red', 'blue', 'green', 'yellow']
 
 // allCards: cartesian product of colors and cards
 const allCards = _.flatMap(
-  (color) => _.map(_.assign({color}), cards),
+  (color) => _.map(_.set('color', color), cards),
   colors
 )
 

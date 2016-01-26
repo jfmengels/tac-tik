@@ -48,7 +48,7 @@ export default _.curry((playerId, pos1, pos2, state) => {
     setErrorIf(onePieceWasNotFound(playerId, index1, index2), onePieceWasNotFoundError),
     setErrorIf(noneOfThePiecesAreYourOwn(playerId, index1, index2), noneOfThePiecesAreYourOwnError),
     setErrorIf(pieceFromOtherPlayerIsBlocking(playerId, index1, index2), pieceFromOtherPlayerIsBlockingError),
-    update(['pieces', index1], _.assign({isBlocking: false, pos: pos2})),
-    update(['pieces', index2], _.assign({isBlocking: false, pos: pos1}))
+    update(['pieces', index1], (s) => _.assign(s, {isBlocking: false, pos: pos2})),
+    update(['pieces', index2], (s) => _.assign(s, {isBlocking: false, pos: pos1}))
   )(state)
 })

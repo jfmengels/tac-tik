@@ -146,7 +146,7 @@ describe('game - distributing cards', () => {
     const { startState, newDeck } = setup()
 
     const removeCardsFromPlayersHand = update('players', _.map(
-      _.assign({cards: []})
+      _.set('cards', [])
     ))
 
     const state1 = distributeCards(startState.cardsInDeck, startState)

@@ -60,7 +60,7 @@ export default _.curry((player, pos, steps, state) => {
     update('pieces', _.map(
       (p) => {
         if (!atPos(p)) { return p }
-        return _.assign({pos: newPos, isBlocking: false}, p)
+        return _.assign(p, {pos: newPos, isBlocking: false})
       }
     ))
   )(state)

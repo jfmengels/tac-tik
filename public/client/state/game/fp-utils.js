@@ -59,4 +59,4 @@ export const applyIf = (cond, fnTrue, fnFalse=_.identity) => (val) => {
  * @param  {string}   error   Error to assign
  * @return {function} function that takes an object and may assign an error field to it
  */
-export const setErrorIf = (cond, error) => applyIf(cond, _.assign({error}))
+export const setErrorIf = (cond, error) => applyIf(cond, _.set('error', error))
