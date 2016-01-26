@@ -50,8 +50,8 @@ describe('game - moving a piece', () => {
 
   it('should not re-set non-blocking piece to blocking', () => {
     const startState = _.flow(
-      _.set(37, ['pieces', 0, 'pos']),
-      _.set(false, ['pieces', 0, 'blocking']),
+      _.set(['pieces', 0, 'pos'], 37),
+      _.set(['pieces', 0, 'blocking'], false),
       freeze
     )(setup())
 

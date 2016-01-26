@@ -17,13 +17,12 @@ export default _.curry((cards, state) => {
 
   const cardsForEachPlayer = _.flow(
     _.take(nCards),
-    // _.chunk is not data-last. Should be fixed in the next release of lodash
-    _.partial(_.chunk, _, numberOfPlayers)
+    _.chunk(numberOfPlayers)
   )(cards)
 
   return _.flow(
     // Remove last nCards from deck
-    _.set(_.takeRight(cards.length - nCards, cards), 'cardsInDeck'),
+    _.set('cardsInDeck', _.takeRight(cards.length - nCards, cards)),
     // players[i] = cardsForEachPlayer[i]
     update('players', _.flow(
       _.zip(cardsForEachPlayer),

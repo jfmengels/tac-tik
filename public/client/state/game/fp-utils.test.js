@@ -97,7 +97,7 @@ describe('fp-utils', () => {
       return {
         error,
         incrementVal: update('val', (n) => n + 1),
-        setError: _.assign({error: error}),
+        setError: _.assign({error}),
         obj: {
           val: 0,
           error: null

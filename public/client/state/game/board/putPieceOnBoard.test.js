@@ -73,7 +73,7 @@ describe('game - starting a piece', () => {
 
   it('should set an error if the player has no more pieces in stock', () => {
     const startState = setup()
-    const tmpState = freeze(_.set(0, ['players', 3, 'piecesInStock'], startState))
+    const tmpState = freeze(_.set(['players', 3, 'piecesInStock'], 0, startState))
 
     const state = putPieceOnBoard(3, tmpState)
 

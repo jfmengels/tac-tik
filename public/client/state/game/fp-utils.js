@@ -21,7 +21,7 @@ export const isAtPos = _.curry((position, {pos, isHome}) =>
  */
 export const update = _.curry((selector, fn, obj) => {
   const value = fn(_.get(selector, obj))
-  return _.set(value, selector, obj)
+  return _.set(selector, value, obj)
 })
 
 /**

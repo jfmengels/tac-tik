@@ -230,7 +230,7 @@ describe('game - playing a card', () => {
 
   it(`should set an error when card action is unknown`, () => {
     const startState = _.flow(
-      _.set('UNKNOWN ACTION', ['players', 1, 'cards', 0, 'action']),
+      _.set(['players', 1, 'cards', 0, 'action'], 'UNKNOWN ACTION'),
       freeze
     )(setup())
     const card = startState.players[1].cards[0] // 1/start card
